@@ -1,0 +1,1949 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>第二课：棋王的心事 | 华小四年级双屏互动学习游戏</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700;900&family=ZCOOL+KuaiLe&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --emerald-deep: #154734;
+      --paper-warm: #fcf9f2;
+      --card-surface: #ffffff;
+      --sun-orange: #f59e0b;
+      --sky-blue: #0ea5e9;
+    }
+
+    body {
+      font-family: 'Noto Sans SC', -apple-system, BlinkMacSystemFont, sans-serif;
+      background-color: #f3ede0;
+      background-image: 
+        radial-gradient(#dcd2be 1.2px, transparent 1.2px),
+        radial-gradient(#e5dcc8 1.2px, #f3ede0 1.2px);
+      background-size: 28px 28px;
+      background-position: 0 0, 14px 14px;
+      color: #292524;
+      overflow-x: hidden;
+    }
+
+    .font-fun {
+      font-family: 'ZCOOL KuaiLe', 'Noto Sans SC', cursive, sans-serif;
+    }
+
+    /* 温暖护眼纸张面板 */
+    .paper-card {
+      background: var(--paper-warm);
+      border: 2px solid #e6dcc8;
+      box-shadow: 0 12px 28px -6px rgba(21, 71, 52, 0.12), 0 4px 10px -2px rgba(21, 71, 52, 0.05);
+    }
+
+    /* 翡翠绿棋盘风格顶栏 */
+    .header-board {
+      background: linear-gradient(135deg, #134e4a 0%, #166534 100%);
+      border-bottom: 4px solid #f59e0b;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.16);
+    }
+
+    /* 汉字田字格 */
+    .tian-zi-ge {
+      position: relative;
+      background: #fffdf9;
+      border: 3px solid #f59e0b;
+      box-shadow: inset 0 0 14px rgba(245, 158, 11, 0.1);
+    }
+    .tian-zi-ge::before {
+      content: "";
+      position: absolute;
+      top: 50%;
+      left: 0;
+      right: 0;
+      border-top: 1.5px dashed #fcd34d;
+      pointer-events: none;
+    }
+    .tian-zi-ge::after {
+      content: "";
+      position: absolute;
+      left: 50%;
+      top: 0;
+      bottom: 0;
+      border-left: 1.5px dashed #fcd34d;
+      pointer-events: none;
+    }
+
+    /* 3D 触感按钮 */
+    .btn-push {
+      transition: transform 0.12s ease, box-shadow 0.12s ease;
+      box-shadow: 0 4px 0 rgba(0, 0, 0, 0.18);
+    }
+    .btn-push:active:not(:disabled) {
+      transform: translateY(3px);
+      box-shadow: 0 1px 0 rgba(0, 0, 0, 0.18);
+    }
+
+    /* 最后10秒倒计时红色闪烁心跳 */
+    @keyframes panicBeat {
+      0%, 100% {
+        transform: scale(1);
+        background-color: #fee2e2;
+        border-color: #ef4444;
+      }
+      50% {
+        transform: scale(1.02);
+        background-color: #fecaca;
+        border-color: #dc2626;
+      }
+    }
+    .timer-panic {
+      animation: panicBeat 0.55s infinite ease-in-out;
+    }
+
+    /* 解锁光环 */
+    @keyframes gateUnlock {
+      0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.75); }
+      70% { box-shadow: 0 0 0 22px rgba(16, 185, 129, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+    }
+    .gate-unlocked-glow {
+      animation: gateUnlock 1.2s ease-out;
+    }
+
+    /* 自定义优雅滚动条 */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: #f1eadb; border-radius: 6px; }
+    ::-webkit-scrollbar-thumb { background: #c7baa0; border-radius: 6px; }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+  <!-- ==================== 顶部仪表盘导航栏 ==================== -->
+  <header class="header-board text-white px-4 py-3 sticky top-0 z-40">
+    <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3">
+      <!-- 课程标题与徽章 -->
+      <div class="flex items-center gap-3">
+        <div class="w-11 h-11 rounded-2xl bg-amber-400 text-teal-950 flex items-center justify-center text-2xl shadow-md">
+          ♟️
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="text-[11px] font-black px-2 py-0.5 rounded-full bg-teal-800 text-amber-200 border border-teal-500">华小四年级华文 • 4A (第7-12页)</span>
+            <span id="teacherModeTag" class="hidden text-[11px] font-black px-2 py-0.5 rounded-full bg-rose-600 text-white">教师演示模式</span>
+          </div>
+          <h1 class="text-lg sm:text-xl font-black tracking-wide text-amber-50 font-fun">第二课：棋王的心事</h1>
+        </div>
+      </div>
+
+      <!-- 学生实时仪表盘 & 音频控制 -->
+      <div class="flex flex-wrap items-center gap-2 text-xs">
+        <div class="bg-teal-950/75 border border-teal-700 px-3 py-1.5 rounded-xl flex items-center gap-3">
+          <span title="已学闪卡数">🗂️ 闪卡: <b id="dashCards" class="text-amber-300">0/24</b></span>
+          <span class="text-teal-700">|</span>
+          <span title="当前连击">🔥 连击: <b id="dashStreak" class="text-orange-300">0</b></span>
+          <span class="text-teal-700">|</span>
+          <span title="一次答对真实正确率">🎯 正确率: <b id="dashAccuracy" class="text-emerald-300">100%</b></span>
+          <span class="text-teal-700">|</span>
+          <span title="待消灭错题数">👾 待灭错题: <b id="dashPendingErrors" class="text-rose-300">0</b></span>
+          <span class="text-teal-700">|</span>
+          <span title="闯关总分">🏆 <b id="dashScore" class="text-amber-300">0</b>分</span>
+        </div>
+
+        <!-- 语速切换 -->
+        <button onclick="toggleSpeechRate()" class="bg-teal-800 hover:bg-teal-700 border border-teal-600 px-2.5 py-1.5 rounded-xl font-bold flex items-center gap-1 transition">
+          <span>🐢</span>
+          <span id="speechRateLabel">慢速 0.85x</span>
+        </button>
+
+        <!-- 背景音乐开关 -->
+        <button id="bgmBtn" onclick="toggleBGM()" class="bg-amber-400 hover:bg-amber-300 text-teal-950 px-3 py-1.5 rounded-xl font-black flex items-center gap-1 shadow transition">
+          <span id="bgmIcon">🔇</span>
+          <span id="bgmText">开启音乐</span>
+        </button>
+
+        <!-- 教师快速演示开关 -->
+        <button onclick="toggleTeacherMode()" class="text-[11px] text-teal-200/75 hover:text-amber-200 underline px-1">
+          教师模式
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ==================== 双屏学习主舞台 ==================== -->
+  <main class="flex-1 max-w-7xl w-full mx-auto p-3 sm:p-5 grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
+
+    <!-- ==================== 左侧栏：魔法认字闪卡实验室 ==================== -->
+    <section class="lg:col-span-6 paper-card rounded-3xl p-4 sm:p-6 flex flex-col justify-between min-h-[670px]">
+      <div>
+        <!-- 顶部进度与已读徽章 -->
+        <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+          <div class="flex items-center gap-2">
+            <span class="px-3 py-1 rounded-full bg-emerald-700 text-white text-xs font-black">左侧：魔法认字闪卡实验室</span>
+            <span id="cardReadBadge" class="px-2.5 py-1 rounded-full bg-amber-100 text-amber-800 border border-amber-300 text-xs font-bold">⏳ 学习中</span>
+          </div>
+          <span id="cardIndexText" class="text-xs sm:text-sm font-black text-emerald-900 bg-emerald-100 px-3 py-1 rounded-full">第 1 / 24 张</span>
+        </div>
+
+        <!-- 五大模块标签页 -->
+        <div id="moduleTabs" class="grid grid-cols-5 gap-1.5 mb-4">
+          <button onclick="switchModule('vocab')" data-mod="vocab" class="mod-tab py-1.5 px-1 rounded-xl text-[11px] sm:text-xs font-black bg-emerald-700 text-white text-center transition">
+            生字构词<br><span class="text-[10px] font-normal opacity-90">(15张)</span>
+          </button>
+          <button onclick="switchModule('compare')" data-mod="compare" class="mod-tab py-1.5 px-1 rounded-xl text-[11px] sm:text-xs font-bold bg-stone-200 text-stone-700 text-center transition">
+            多音同反<br><span class="text-[10px] font-normal opacity-80">(4张)</span>
+          </button>
+          <button onclick="switchModule('idiom')" data-mod="idiom" class="mod-tab py-1.5 px-1 rounded-xl text-[11px] sm:text-xs font-bold bg-stone-200 text-stone-700 text-center transition">
+            成语谚语<br><span class="text-[10px] font-normal opacity-80">(3张)</span>
+          </button>
+          <button onclick="switchModule('grammar')" data-mod="grammar" class="mod-tab py-1.5 px-1 rounded-xl text-[11px] sm:text-xs font-bold bg-stone-200 text-stone-700 text-center transition">
+            “一”变调<br><span class="text-[10px] font-normal opacity-80">(1张)</span>
+          </button>
+          <button onclick="switchModule('diary')" data-mod="diary" class="mod-tab py-1.5 px-1 rounded-xl text-[11px] sm:text-xs font-bold bg-stone-200 text-stone-700 text-center transition">
+            趣味日记<br><span class="text-[10px] font-normal opacity-80">(1张)</span>
+          </button>
+        </div>
+
+        <!-- 闪卡核心展示卡片 -->
+        <div id="flashcardContent" class="bg-white rounded-2xl border-2 border-amber-200 p-4 sm:p-5 shadow-inner min-h-[455px] flex flex-col justify-between">
+          <!-- JS 动态渲染 -->
+        </div>
+      </div>
+
+      <!-- 底部 5 秒强制阅读计时条 & 翻页控制 -->
+      <div class="mt-4 pt-3 border-t-2 border-dashed border-stone-200">
+        <div id="cardLockBanner" class="mb-3 bg-amber-50 border border-amber-300 rounded-xl p-2.5">
+          <div class="flex items-center justify-between text-xs font-bold text-amber-900 mb-1">
+            <span id="cardLockHint">⏳ 仔细看一看、点击喇叭听发音（还需 5 秒解锁下一张）</span>
+            <span id="cardLockSec" class="font-black text-amber-700">5s</span>
+          </div>
+          <div class="w-full h-2.5 bg-amber-200/70 rounded-full overflow-hidden">
+            <div id="cardLockBar" class="h-full bg-gradient-to-r from-amber-500 to-emerald-500 rounded-full transition-all duration-200" style="width: 0%"></div>
+          </div>
+        </div>
+
+        <div class="flex items-center justify-between gap-2">
+          <button id="prevCardBtn" onclick="prevCard()" class="btn-push px-3.5 py-2.5 rounded-2xl bg-stone-200 hover:bg-stone-300 disabled:opacity-40 text-stone-800 font-bold text-xs sm:text-sm flex items-center gap-1">
+            <span>⬅️</span><span>上一张</span>
+          </button>
+
+          <button onclick="speakCurrentCard()" class="btn-push px-4 py-2.5 rounded-2xl bg-sky-500 hover:bg-sky-600 text-white font-black text-xs sm:text-sm flex items-center gap-1.5">
+            <span>🔊</span><span>朗读整张闪卡</span>
+          </button>
+
+          <button id="nextCardBtn" onclick="nextCard()" disabled class="btn-push px-4 py-2.5 rounded-2xl bg-emerald-600 hover:bg-emerald-700 disabled:bg-stone-300 disabled:text-stone-500 disabled:cursor-not-allowed text-white font-black text-xs sm:text-sm flex items-center gap-1">
+            <span id="nextCardLabel">请阅读 (5s)</span><span>➡️</span>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== 右侧栏：三步连环闯关训练场 ==================== -->
+    <section id="rightQuizPanel" class="lg:col-span-6 paper-card rounded-3xl p-4 sm:p-6 min-h-[670px] relative flex flex-col justify-between overflow-hidden">
+
+      <!-- 闯关锁定遮罩层（学完左侧 24 张闪卡后自动开启） -->
+      <div id="quizGateOverlay" class="absolute inset-0 z-30 bg-teal-950/85 backdrop-blur-sm flex flex-col items-center justify-center p-6 text-center text-white transition-opacity duration-500">
+        <div class="w-20 h-20 rounded-3xl bg-amber-400 text-teal-950 flex items-center justify-center text-4xl shadow-xl mb-4 animate-bounce">
+          🔒
+        </div>
+        <h2 class="text-2xl font-black text-amber-300 font-fun mb-2">闯关大门尚未解锁</h2>
+        <p class="text-sm sm:text-base text-teal-100 max-w-md leading-relaxed mb-4">
+          完成左侧所有闪卡学习后自动解锁闯关大门！<br>
+          <span class="text-amber-300 font-black text-lg" id="remainingCardsPrompt">（剩余 24 张未完成阅读）</span>
+        </p>
+        <button onclick="jumpToFirstUnreadCard()" class="btn-push px-6 py-3 rounded-2xl bg-amber-400 hover:bg-amber-300 text-teal-950 font-black text-sm flex items-center gap-2">
+          <span>🚀</span>
+          <span>一键跳转到下一张未读闪卡</span>
+        </button>
+      </div>
+
+      <!-- 闯关顶部状态与双阶段倒计时 -->
+      <div>
+        <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+          <div class="flex items-center gap-2">
+            <span class="px-3 py-1 rounded-full bg-amber-500 text-teal-950 text-xs font-black">右侧：三步连环闯关</span>
+            <span id="quizStepPill" class="px-3 py-1 rounded-full bg-indigo-100 text-indigo-800 border border-indigo-200 text-xs font-bold">第 1 步：选词填空</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <span id="retryBadge" class="hidden px-2.5 py-1 rounded-full bg-rose-100 text-rose-700 border border-rose-300 text-xs font-black">🔁 错题重练</span>
+            <span id="quizProgressPill" class="text-xs sm:text-sm font-black text-stone-700 bg-stone-200/80 px-3 py-1 rounded-full">第 1 / 30 题</span>
+          </div>
+        </div>
+
+        <!-- 5秒审题锁 / 35秒作答倒计时面板 -->
+        <div id="quizTimerBox" class="mb-3 rounded-2xl border-2 border-sky-300 bg-sky-50 p-3 transition-all">
+          <div class="flex items-center justify-between mb-1">
+            <div class="flex items-center gap-2">
+              <span id="quizTimerIcon" class="text-lg">👀</span>
+              <span id="quizTimerTitle" class="text-xs sm:text-sm font-black text-sky-900">仔细读题，5秒后解锁作答...</span>
+            </div>
+            <div class="flex items-baseline gap-1">
+              <span id="quizTimerNum" class="text-xl font-black text-sky-700">5</span>
+              <span class="text-xs font-bold text-stone-500">秒</span>
+            </div>
+          </div>
+          <div class="w-full h-2.5 bg-white rounded-full overflow-hidden border border-sky-200">
+            <div id="quizTimerProgress" class="h-full bg-sky-500 rounded-full transition-all duration-200" style="width: 100%"></div>
+          </div>
+        </div>
+
+        <!-- 超级技能栏（每答对5题获得） -->
+        <div class="mb-3 bg-gradient-to-r from-amber-50 via-orange-50 to-amber-50 border border-amber-200 rounded-2xl p-2.5">
+          <div class="flex items-center justify-between mb-1.5 px-1">
+            <span class="text-xs font-black text-amber-900">
+              ⚡ 超级技能栏 <span class="font-normal text-amber-700 text-[11px]">（再答对 <b id="bonusCountdown">5</b> 题开启技能宝箱）</span>
+            </span>
+            <span id="doubleActiveTag" class="hidden text-[11px] font-black bg-purple-600 text-white px-2 py-0.5 rounded-full animate-pulse">✨ 2X 双倍积分生效中</span>
+          </div>
+          <div class="grid grid-cols-4 gap-2">
+            <button onclick="useSkill('freeze')" id="btnSkill-freeze" disabled class="p-1.5 rounded-xl border border-amber-300 bg-white hover:bg-amber-100 disabled:opacity-40 transition flex flex-col items-center text-center">
+              <span class="text-base">⏳</span>
+              <span class="text-[11px] font-bold text-stone-800">时间冻结</span>
+              <span id="cntSkill-freeze" class="text-[10px] font-black text-amber-600">x0</span>
+            </button>
+            <button onclick="useSkill('xray')" id="btnSkill-xray" disabled class="p-1.5 rounded-xl border border-amber-300 bg-white hover:bg-amber-100 disabled:opacity-40 transition flex flex-col items-center text-center">
+              <span class="text-base">💡</span>
+              <span class="text-[11px] font-bold text-stone-800">智慧透视</span>
+              <span id="cntSkill-xray" class="text-[10px] font-black text-amber-600">x0</span>
+            </button>
+            <button onclick="useSkill('double')" id="btnSkill-double" disabled class="p-1.5 rounded-xl border border-amber-300 bg-white hover:bg-amber-100 disabled:opacity-40 transition flex flex-col items-center text-center">
+              <span class="text-base">✨</span>
+              <span class="text-[11px] font-bold text-stone-800">双倍积分</span>
+              <span id="cntSkill-double" class="text-[10px] font-black text-amber-600">x0</span>
+            </button>
+            <button onclick="useSkill('shield')" id="btnSkill-shield" disabled class="p-1.5 rounded-xl border border-amber-300 bg-white hover:bg-amber-100 disabled:opacity-40 transition flex flex-col items-center text-center">
+              <span class="text-base">🔄</span>
+              <span class="text-[11px] font-bold text-stone-800">免罚护盾</span>
+              <span id="cntSkill-shield" class="text-[10px] font-black text-amber-600">x0</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- 题目展示容器 -->
+        <div id="quizCardBody" class="bg-white rounded-2xl border-2 border-stone-200 p-4 sm:p-5 shadow-sm">
+          <!-- JS 动态渲染 -->
+        </div>
+      </div>
+
+      <!-- 答题解析反馈栏 -->
+      <div id="quizFeedbackPanel" class="hidden mt-4 rounded-2xl p-4 border-2 transition-all">
+        <div class="flex items-start gap-3">
+          <span id="fbEmoji" class="text-2xl">🎉</span>
+          <div class="flex-1">
+            <h4 id="fbHeading" class="font-black text-sm sm:text-base mb-1">回答正确！</h4>
+            <p id="fbBody" class="text-xs sm:text-sm leading-relaxed"></p>
+          </div>
+        </div>
+        <div class="mt-3 flex justify-end">
+          <button id="nextQuizBtn" onclick="goNextQuestion()" class="hidden btn-push px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-black text-sm">
+            进入下一题 ➡️
+          </button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ==================== 弹窗 1：每答对 5 题【超级技能宝箱抽奖】 ==================== -->
+  <div id="chestModal" class="hidden fixed inset-0 z-50 bg-black/75 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-[#fffdf8] border-4 border-amber-400 rounded-3xl max-w-md w-full p-6 text-center shadow-2xl">
+      <div class="text-5xl mb-2 animate-bounce">🎁</div>
+      <span class="px-3 py-1 rounded-full bg-amber-100 text-amber-800 text-xs font-black">累计答对 5 题奖励！</span>
+      <h3 class="text-2xl font-black text-emerald-950 font-fun mt-2 mb-1">⚡ 超级技能宝箱</h3>
+      <p class="text-xs sm:text-sm text-stone-600 mb-4">恭喜你连续闯关成功！请点击领取你的专属技能卡：</p>
+
+      <div class="grid grid-cols-2 gap-3 text-left">
+        <button onclick="pickChestSkill('freeze')" class="p-3 rounded-2xl border-2 border-sky-300 bg-sky-50 hover:bg-sky-100 transition flex flex-col gap-1">
+          <span class="text-2xl">⏳</span>
+          <span class="font-black text-stone-900 text-sm">时间冻结 (+15秒)</span>
+          <span class="text-[11px] text-stone-600">延长当前题目作答时间 15 秒</span>
+        </button>
+        <button onclick="pickChestSkill('xray')" class="p-3 rounded-2xl border-2 border-amber-300 bg-amber-50 hover:bg-amber-100 transition flex flex-col gap-1">
+          <span class="text-2xl">💡</span>
+          <span class="font-black text-stone-900 text-sm">智慧透视镜</span>
+          <span class="text-[11px] text-stone-600">排除错误选项或高亮提示正确构词</span>
+        </button>
+        <button onclick="pickChestSkill('double')" class="p-3 rounded-2xl border-2 border-purple-300 bg-purple-50 hover:bg-purple-100 transition flex flex-col gap-1">
+          <span class="text-2xl">✨</span>
+          <span class="font-black text-stone-900 text-sm">双倍积分卡</span>
+          <span class="text-[11px] text-stone-600">接下来 2 题答对获得双倍高分</span>
+        </button>
+        <button onclick="pickChestSkill('shield')" class="p-3 rounded-2xl border-2 border-emerald-300 bg-emerald-50 hover:bg-emerald-100 transition flex flex-col gap-1">
+          <span class="text-2xl">🔄</span>
+          <span class="font-black text-stone-900 text-sm">错题消除护盾</span>
+          <span class="text-[11px] text-stone-600">答错时使用，免除错题重排入队列惩罚</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== 弹窗 2：100% 正确率通关荣耀证书 ==================== -->
+  <div id="winModal" class="hidden fixed inset-0 z-50 bg-black/75 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white border-4 border-emerald-500 rounded-3xl max-w-lg w-full p-6 sm:p-8 text-center shadow-2xl">
+      <div class="text-6xl mb-3">👑🏆</div>
+      <span class="px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 text-xs font-black">100% 完美通关</span>
+      <h2 class="text-2xl sm:text-3xl font-black text-emerald-950 font-fun mt-2 mb-2">太厉害了！你是小小棋王！</h2>
+      <p class="text-sm text-stone-600 mb-5 leading-relaxed">
+        你已经学完了《第二课：棋王的心事》全部 24 张闪卡，并消灭了所有错题，达成 <b class="text-emerald-600">100% 正确率</b>！
+      </p>
+
+      <div class="bg-amber-50 border-2 border-amber-200 rounded-2xl p-4 mb-6 grid grid-cols-3 gap-2">
+        <div>
+          <div class="text-xs text-stone-500">最终积分</div>
+          <div id="finalScoreVal" class="text-xl font-black text-amber-600">0</div>
+        </div>
+        <div>
+          <div class="text-xs text-stone-500">最终掌握率</div>
+          <div class="text-xl font-black text-emerald-600">100%</div>
+        </div>
+        <div>
+          <div class="text-xs text-stone-500">荣耀称号</div>
+          <div class="text-base font-black text-indigo-600">认字小棋王</div>
+        </div>
+      </div>
+
+      <button onclick="resetGame()" class="btn-push w-full py-3.5 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-black text-base">
+        🔄 再挑战一次
+      </button>
+    </div>
+  </div>
+
+  <script>
+    // =========================================================================
+    // 1. 完整《第二课：棋王的心事》教材闪卡库（第7-12页，共24张）
+    // =========================================================================
+    const FLASHCARDS = [
+      // --- 模块一：15个核心生字与构词双语详解 ---
+      {
+        id: 'f1', mod: 'vocab', label: '生字 1/15',
+        char: '杂', pinyin: 'zá', strokes: '6 画', radical: '木 (木字底)',
+        meaning: '疑难杂症 (penyakit yang rumit & sukar diubati)：各种病理不明或难治的病。',
+        tip: '上面是“九”，下面是“木”，九种不同的木头混在一起，就是复“杂”、混“杂”！注意和“朵”(花朵)区分哦！',
+        words: [
+          { w: '杂事 (zá shì)', m: 'kerja-kerja rencam（各种零碎的事情）' },
+          { w: '杂乱 (zá luàn)', m: 'bersepah / tidak teratur（又多又乱，没有条理）' },
+          { w: '杂货店 (zá huò diàn)', m: 'kedai runcit（卖各种日用品的商店）' }
+        ],
+        example: '这名老中医医术了得 (hebat)，专治各种疑难杂症 (penyakit rumit)。',
+        speech: '生字：杂，第二声 zá。课文词义：疑难杂症，指各种病理不明或难治的病。构词有：杂事、杂乱、杂货店。'
+      },
+      {
+        id: 'f2', mod: 'vocab', label: '生字 2/15',
+        char: '艺', pinyin: 'yì', strokes: '4 画', radical: '艹 (草字头)',
+        meaning: '棋艺 (kemahiran bermain catur)：下棋的技艺。',
+        tip: '草字头 (艹) 下面一个“乙”，笔画只有 4 画，像一株修剪得很漂亮的“艺”术盆栽！',
+        words: [
+          { w: '艺术 (yì shù)', m: 'seni（用形象反映现实的创造活动，如画画、音乐）' },
+          { w: '园艺 (yuán yì)', m: 'seni berkebun（栽培花草果木的技术）' },
+          { w: '茶艺 (chá yì)', m: 'seni membancuh teh（泡茶和品茶的艺术）' }
+        ],
+        example: '哥哥参加了象棋学会 (persatuan catur)，钻研 (mendalami) 棋艺。',
+        speech: '生字：艺，第四声 yì。课文词义：棋艺，意思是下棋的技艺。构词有：艺术、园艺、茶艺。'
+      },
+      {
+        id: 'f3', mod: 'vocab', label: '生字 3/15',
+        char: '仿', pinyin: 'fǎng', strokes: '6 画', radical: '亻 (单人旁)',
+        meaning: '仿佛 (seolah-olah / bagaikan)：似乎；好像。',
+        tip: '单人旁 (亻) 站在“方”向旁边，照着别人的样子学，就是模“仿”；也是“仿佛”（好像）！',
+        words: [
+          { w: '仿造 (fǎng zào)', m: 'meniru buatan（照着现成的样子制造）' },
+          { w: '模仿 (mó fǎng)', m: 'meniru gaya（照某种现成的样子学着做）' },
+          { w: '效仿 (xiào fǎng)', m: 'mencontohi（仿效好的榜样）' }
+        ],
+        example: '爸爸是个工作狂，一干起活来就仿佛 (seolah-olah) 不知道饥饿和疲倦了。',
+        speech: '生字：仿，第三声 fǎng。课文词义：仿佛，意思是似乎、好像。构词有：仿造、模仿、效仿。'
+      },
+      {
+        id: 'f4', mod: 'vocab', label: '生字 4/15',
+        char: '协', pinyin: 'xié', strokes: '6 画', radical: '十 (十字旁)',
+        meaning: '协调 (selaras / harmoni)：使配合得适当。',
+        tip: '左边是“十”，右边是三个“力”（办），十个人一起出力互相帮忙，就是“协”助和“协”调！',
+        words: [
+          { w: '协助 (xié zhù)', m: 'membantu（从旁帮助）' },
+          { w: '协和 (xié hé)', m: 'harmoni dan muafakat（和谐融洽）' },
+          { w: '协议 (xié yì)', m: 'perjanjian（共同协商订立的条款）' }
+        ],
+        example: '姐姐对跳舞毫无天分 (tiada bakat)，手脚根本无法协调 (selaras)。',
+        speech: '生字：协，第二声 xié。课文词义：协调，意思是使配合得适当。构词有：协助、协和、协议。'
+      },
+      {
+        id: 'f5', mod: 'vocab', label: '生字 5/15',
+        char: '输', pinyin: 'shū', strokes: '13 画', radical: '车 (车字旁)',
+        meaning: '输 (kalah)：在较量时失败（反义词：赢）。',
+        tip: '左边是“车”，用车子把货物运送出去叫运“输”；比赛分数比别人少就是“输”了！',
+        words: [
+          { w: '输入 (shū rù)', m: 'memasukkan / input（从外部送到里面，如输入密码）' },
+          { w: '灌输 (guàn shū)', m: 'menanamkan（把思想或知识输送给别人）' },
+          { w: '运输 (yùn shū)', m: 'pengangkutan（用交通工具把人或物运到别处）' }
+        ],
+        example: '哥哥在比赛中输了一球，与冠军宝座擦肩而过 (terlepas peluang)。',
+        speech: '生字：输，第一声 shū。课文词义：输，意思是在较量时失败。构词有：输入、灌输、运输。'
+      },
+      {
+        id: 'f6', mod: 'vocab', label: '生字 6/15',
+        char: '拒', pinyin: 'jù', strokes: '7 画', radical: '扌 (提手旁)',
+        meaning: '拒绝 (menolak)：不接受（请求、意见或赠礼等）。',
+        tip: '伸出“手” (扌) 把“巨”大的要求推开，就是“拒”绝！注意：用“手”推开是“拒”，用“脚”量距离是“距”！',
+        words: [
+          { w: '抗拒 (kàng jù)', m: 'menentang（抵抗并拒绝）' },
+          { w: '拒捕 (jù bǔ)', m: 'melawan tangkapan（抗拒逮捕）' },
+          { w: '来者不拒 (lái zhě bù jù)', m: 'tidak menolak sesiapa pun（对于来的人或要求一概不拒绝）' }
+        ],
+        example: '小明要独自出门玩耍，被妈妈拒绝 (menolak) 了。',
+        speech: '生字：拒，第四声 jù。课文词义：拒绝，意思是不接受请求、意见或赠礼。构词有：抗拒、拒捕、来者不拒。'
+      },
+      {
+        id: 'f7', mod: 'vocab', label: '生字 7/15',
+        char: '绝', pinyin: 'jué', strokes: '9 画', radical: '纟 (绞丝旁)',
+        meaning: '拒绝 / 绝妙 (hebat / putus)：断绝；极、最。',
+        tip: '用刀把“丝”线 (纟) 割断，就是断“绝”；厉害到极点就是“绝”妙！',
+        words: [
+          { w: '绝种 (jué zhǒng)', m: 'pupus（生物物种完全灭绝，如恐龙绝种）' },
+          { w: '绝妙 (jué miào)', m: 'sangat bijak / hebat（好到极点，非常美妙）' },
+          { w: '回绝 (huí jué)', m: 'menolak permintaan（答复并拒绝）' }
+        ],
+        example: '他想出了一个绝妙 (sangat bijak) 的好主意，解决了大家的难题。',
+        speech: '生字：绝，第二声 jué。构词有：绝种、绝妙、回绝。'
+      },
+      {
+        id: 'f8', mod: 'vocab', label: '生字 8/15',
+        char: '距', pinyin: 'jù', strokes: '11 画', radical: '足 (足字旁)',
+        meaning: '距离 (jarak)：相隔的长度。',
+        tip: '左边是“足”（脚），用脚一步一步量出来的长度，就是“距”离！',
+        words: [
+          { w: '相距 (xiāng jù)', m: 'berjarak（两地之间相隔的距离）' },
+          { w: '距今 (jù jīn)', m: 'sehingga hari ini（距离现在，如：距今一百年）' },
+          { w: '距离 (jù lí)', m: 'jarak（在空间或时间上相隔的长度）' }
+        ],
+        example: '为了不被发现，侦探 (detektif) 在跟踪目标人物时都保持距离 (jarak)。',
+        speech: '生字：距，第四声 jù。课文词义：距离，意思是相隔的长度。构词有：相距、距今、距离。'
+      },
+      {
+        id: 'f9', mod: 'vocab', label: '生字 9/15',
+        char: '孤', pinyin: 'gū', strokes: '8 画', radical: '子 (子字旁)',
+        meaning: '孤零零 (sebatang kara / keseorangan)：形容孤单，无依无靠或没有陪衬。',
+        tip: '左边是“子”（小孩子），小孩子一个人坐在“瓜”棚下没有伴，真是“孤”单啊！注意和“狐”（狐狸，反犬旁）区分！',
+        words: [
+          { w: '孤独 (gū dú)', m: 'sunyi / keseorangan（独自一人，感到寂寞）' },
+          { w: '孤单 (gū dān)', m: 'seorang diri（单身无靠，感到寂寞）' },
+          { w: '孤儿 (gū ér)', m: 'anak yatim piatu（失去父母的儿童）' }
+        ],
+        example: '老伯伯的孩子都移居国外了，剩下他孤零零 (keseorangan) 一人住在乡下。',
+        speech: '生字：孤，第一声 gū。课文词义：孤零零，形容孤单，无依无靠。构词有：孤独、孤单、孤儿。'
+      },
+      {
+        id: 'f10', mod: 'vocab', label: '生字 10/15',
+        char: '挨', pinyin: 'āi / ái (多音字)', strokes: '10 画', radical: '扌 (提手旁)',
+        meaning: '挨 (bersebelahan / rapat)：靠近；紧接着（读 āi）；遭受痛苦（读 ái，如挨饿）。',
+        tip: '读第一声 āi 时表示“紧靠着”（我家挨着学校）；读第二声 ái 时表示“忍受痛苦”（挨饿、挨打）！',
+        words: [
+          { w: '挨户 (āi hù)', m: 'dari rumah ke rumah（一家接一家）' },
+          { w: '挨近 (āi jìn)', m: 'menghampiri（靠近）' },
+          { w: '挨个儿 (āi gèr)', m: 'satu demi satu（一个接一个）' },
+          { w: '挨饿 (ái è)', m: 'menahan lapar（忍受饥饿）' }
+        ],
+        example: '我家挨着 (bersebelahan) 学校，所以每天自行走路去上学，无需人接送。',
+        speech: '生字：挨，多音字，āi 或 ái。课文词义：挨，意思是靠近、紧接着。构词有：挨户、挨近、挨个儿、挨饿。'
+      },
+      {
+        id: 'f11', mod: 'vocab', label: '生字 11/15',
+        char: '勾', pinyin: 'gōu / gòu (多音字)', strokes: '4 画', radical: '勹 (包字头)',
+        meaning: '勾肩搭背 (berpeluk bahu)：彼此把手搭在对方的肩上或背上，形容亲昵的状态。',
+        tip: '弯弯的包字头 (勹) 里面一个撇折点，像钩子把两个人勾在一起！读 gōu 指勾画、勾肩搭背；读 gòu 指勾当。',
+        words: [
+          { w: '勾画 (gōu huà)', m: 'melakar（用线条画出轮廓）' },
+          { w: '勾结 (gōu jié)', m: 'berkomplot（暗中串通做坏事）' },
+          { w: '勾通 (gōu tōng)', m: 'berpakat secara rahsia（暗中串通）' }
+        ],
+        example: '他和小刚是勾肩搭背 (berpeluk bahu) 的哥儿们，经常形影不离 (tidak berpisah)。',
+        speech: '生字：勾，第一声 gōu。课文词义：勾肩搭背，形容关系亲昵。构词有：勾画、勾结、勾通。'
+      },
+      {
+        id: 'f12', mod: 'vocab', label: '生字 12/15',
+        char: '遭', pinyin: 'zāo', strokes: '14 画', radical: '辶 (走之底)',
+        meaning: '遭遇 (nasib / pengalaman buruk)：遇到的事情（多指不幸的）。',
+        tip: '走路 (辶) 时突然遇到“曹”操大军拦路，真是“遭”遇到不幸的事情啊！',
+        words: [
+          { w: '遭逢 (zāo féng)', m: 'mengalami / menemui（遇到、碰到）' },
+          { w: '遭受 (zāo shòu)', m: 'menanggung / ditimpa（受到不幸或损害，如遭受水灾）' },
+          { w: '遭殃 (zāo yāng)', m: 'ditimpa malang（遭受灾祸）' }
+        ],
+        example: '安徒生从丑小鸭坎坷悲惨的遭遇 (nasib malang) 中，暗示着当时社会的环境状况。',
+        speech: '生字：遭，第一声 zāo。课文词义：遭遇，意思是遇到的事情，多指不幸的。构词有：遭逢、遭受、遭殃。'
+      },
+      {
+        id: 'f13', mod: 'vocab', label: '生字 13/15',
+        char: '威', pinyin: 'wēi', strokes: '9 画', radical: '戈 (戈字旁)',
+        meaning: '威风 (hebat / berwibawa)：使人敬畏的声势或气派。',
+        tip: '里面有一个“女”字，外面拿着“戈”（古代兵器），气势强大让人敬畏，就是“威”风！',
+        words: [
+          { w: '威名 (wēi míng)', m: 'nama yang disegani（令人敬畏的声望）' },
+          { w: '威武 (wēi wǔ)', m: 'gagah perkasa（声势强大、勇武）' },
+          { w: '示威 (shì wēi)', m: 'tunjuk perasaan（显示威力或举行抗议游行）' }
+        ],
+        example: '我们必须要有信心，不能长他人的志气，灭自己的威风 (kewibawaan)。',
+        speech: '生字：威，第一声 wēi。课文词义：威风，意思是使人敬畏的声势或气派。构词有：威名、威武、示威。'
+      },
+      {
+        id: 'f14', mod: 'vocab', label: '生字 14/15',
+        char: '拥', pinyin: 'yōng', strokes: '8 画', radical: '扌 (提手旁)',
+        meaning: '拥戴 (menyokong / menjulang)：拥护推戴。',
+        tip: '伸出双“手” (扌) 把好朋友“用”力抱住，就是“拥”抱；大家一起支持好领袖叫“拥戴”！',
+        words: [
+          { w: '拥抱 (yōng bào)', m: 'memeluk（搂抱，表示亲爱）' },
+          { w: '拥有 (yōng yǒu)', m: 'memiliki（领有、具有）' },
+          { w: '拥挤 (yōng jǐ)', m: 'sesak（人或车马挤在一起）' }
+        ],
+        example: '村长为发展村庄劳心劳力，深得村民的拥戴 (sokongan padu)。',
+        speech: '生字：拥，第一声 yōng。课文词义：拥戴，意思是拥护推戴。构词有：拥抱、拥有、拥挤。'
+      },
+      {
+        id: 'f15', mod: 'vocab', label: '生字 15/15',
+        char: '磨', pinyin: 'mó / mò (多音字)', strokes: '16 画', radical: '麻 / 石',
+        meaning: '磨练 (melatih diri dalam kesukaran)：（在艰难困苦的环境中）锻炼。',
+        tip: '“麻”下面一块大“石”头，把石头磨光滑需要很久，人在困难中锻炼自己就是“磨练” (mó)！磨豆腐读 mò。',
+        words: [
+          { w: '消磨 (xiāo mó)', m: 'menghabiskan masa（打发时间或逐渐消耗）' },
+          { w: '磨损 (mó sǔn)', m: 'haus / rosak akibat geseran（摩擦损耗）' },
+          { w: '折磨 (zhé mó)', m: 'menyeksa（使肉体或精神受痛苦）' }
+        ],
+        example: '只有经历地狱般的磨练 (latihan yang mencabar)，才能炼出创造天堂的力量。',
+        speech: '生字：磨，多音字，mó 或 mò。课文词义：磨练，意思是在艰难困苦的环境中锻炼。构词有：消磨、磨损、折磨。'
+      },
+
+      // --- 模块二：同反义词、多音字、同音字、形似字 ---
+      {
+        id: 'f16', mod: 'compare', label: '同反义词',
+        title: '同义词 (Sinonim) 与 反义词 (Antonim)',
+        tip: '记住这 3 组同义词和 3 组反义词，做词义理解题又快又准！',
+        pairs: [
+          { type: '同义词 (=)', left: '仿佛', right: '好像', malay: 'seolah-olah / bagaikan' },
+          { type: '同义词 (=)', left: '输', right: '败', malay: 'kalah' },
+          { type: '同义词 (=)', left: '磨练', right: '锻炼', malay: 'melatih diri' },
+          { type: '反义词 (×)', left: '输', right: '赢', malay: 'kalah × menang' },
+          { type: '反义词 (×)', left: '拒绝', right: '接受', malay: 'menolak × menerima' },
+          { type: '反义词 (×)', left: '拥戴', right: '摒弃', malay: 'menyokong × membuang' }
+        ],
+        speech: '同义词：仿佛等于好像，输等于败，磨练等于锻炼。反义词：输对赢，拒绝对应接受，拥戴对应摒弃。'
+      },
+      {
+        id: 'f17', mod: 'compare', label: '多音字宝典',
+        title: '本课 3 个重要多音字 (Perkataan Banyak Bunyi)',
+        tip: '同一个字，意思不同，读音就变啦！大声朗读对比一下：',
+        polyphones: [
+          { char: '挨', r1: 'āi ：挨次、挨近 (bersebelahan / rapat)', r2: 'ái ：挨冻、挨饿 (menahan sejuk / lapar)' },
+          { char: '勾', r1: 'gōu ：勾搭、勾心斗角 (melakar / berpakat)', r2: 'gòu ：勾当 (perbuatan jahat)' },
+          { char: '磨', r1: 'mó ：磨合、磨灭、磨练 (mengasah / melatih)', r2: 'mò ：磨豆腐、磨不开 (mengisar / segan)' }
+        ],
+        speech: '多音字学习。挨：第一声 āi，挨次、挨近；第二声 ái，挨冻、挨饿。勾：第一声 gōu，勾搭；第四声 gòu，勾当。磨：第二声 mó，磨练；第四声 mò，磨豆腐。'
+      },
+      {
+        id: 'f18', mod: 'compare', label: '同音字辨析',
+        title: '同音字大比拼 (Sama Bunyi, Lain Maksud)',
+        tip: '虽然读音一样，但偏旁部首不同，千万别写错别字哦！',
+        homophones: [
+          { py: 'jù', a: '拒 (拒绝、拒收 - 用手扌推开)', b: '距 (距离、相距 - 用脚足量长度)' },
+          { py: 'jué', a: '绝 (绝对、绝招 - 绞丝旁纟)', b: '决 (对决、决定 - 两点水冫)' }
+        ],
+        speech: '同音字辨析。jù：拒绝的拒，距离的距。jué：绝对的绝，决定的决。'
+      },
+      {
+        id: 'f19', mod: 'compare', label: '形似字辨析',
+        title: '形似字火眼金睛 (Bentuk Hampir Sama)',
+        tip: '仔细观察这两个字长得哪里不一样：',
+        lookalikes: [
+          { a: '杂 zá (复杂、繁杂 - 上面是“九”)', b: '朵 duǒ (花朵、云朵 - 上面是“几”)', tip: '“杂”有撇出头（九）；“朵”上面是几，没有出头！' },
+          { a: '孤 gū (孤单、孤陋寡闻 - 子字旁)', b: '狐 hú (狐狸、狐疑 - 反犬旁犭)', tip: '小孩孤单用“子”；狐狸是动物用反犬旁“犭”！' }
+        ],
+        speech: '形似字辨析。杂，复杂的杂；朵，花朵的朵。孤，孤单的孤；狐，狐狸的狐。'
+      },
+
+      // --- 模块三：8个成语与谚语 ---
+      {
+        id: 'f20', mod: 'idiom', label: '成语 (1-4)',
+        title: '课文重点成语 (上)',
+        idioms: [
+          { term: '略胜一筹 (lüè shèng yī chóu)', malay: 'sedikit lebih baik', meaning: '比较起来，稍微好一点。', sentence: '这场足球赛虽然踢平了，但从两队的技术水平看，客队还是略胜一筹。' },
+          { term: '锋芒毕露 (fēng máng bì lù)', malay: 'menunjuk-nunjuk kehebatan', meaning: '指锐气和才干全都表现出来。多形容人气盛逞强。', sentence: '他最大的缺点就是不虚心，处处要出风头，太锋芒毕露了。' },
+          { term: '趾高气扬 (zhǐ gāo qì yáng)', malay: 'angkuh dan sombong', meaning: '形容骄傲自满，得意忘形。', sentence: '满招损，谦受益，不可因一点儿成就便趾高气扬。' },
+          { term: '众目睽睽 (zhòng mù kuí kuí)', malay: 'di hadapan mata orang ramai', meaning: '形容大家的眼睛都注视着。', sentence: '那个少年竟然在众目睽睽下抢东西，真是太猖獗了。' }
+        ],
+        speech: '成语学习：略胜一筹，比较起来稍微好一点。锋芒毕露，指锐气和才干全都表现出来。趾高气扬，形容骄傲自满、得意忘形。众目睽睽，形容大家的眼睛都注视着。'
+      },
+      {
+        id: 'f21', mod: 'idiom', label: '成语 (5-8)',
+        title: '课文重点成语 (下)',
+        idioms: [
+          { term: '口沫横飞 (kǒu mò héng fēi)', malay: 'bercakap berapi-api hingga tersembur air liur', meaning: '唾液四处飞散。形容人放情谈论。', sentence: '每次聚会，他总是口沫横飞地述说自己的威风史，令人远避。' },
+          { term: '高谈阔论 (gāo tán kuò lùn)', malay: 'berbual rancak tentang pelbagai perkara', meaning: '漫无边际地大发议论。', sentence: '我最爱闲来三五好友，泡一壶好茶，高谈阔论。' },
+          { term: '谈笑风生 (tán xiào fēng shēng)', malay: 'berbual mesra dan ceria', meaning: '形容谈话谈得高兴而又风趣。', sentence: '聚餐会上，大家一起开心地享用茶点，谈笑风生。' },
+          { term: '名列前茅 (míng liè qián máo)', malay: 'mendapat tempat teratas', meaning: '名次列在前面。', sentence: '班长的成绩一直名列前茅，是同学们的楷模 (teladan)。' }
+        ],
+        speech: '成语学习：口沫横飞，形容人放情谈论。高谈阔论，漫无边际地大发议论。谈笑风生，形容谈话谈得高兴而又风趣。名列前茅，名次列在前面。'
+      },
+      {
+        id: 'f22', mod: 'idiom', label: '课文谚语',
+        title: '经典谚语 (Peribahasa)',
+        idioms: [
+          {
+            term: '胜败乃兵家常事 (shèng bài nǎi bīng jiā cháng shì)',
+            malay: 'menang atau kalah adalah perkara biasa dalam pertandingan',
+            meaning: '形容成功与失败都是生活常有的事；劝勉人们不要把偶然一次的胜利失败看得太重。',
+            sentence: '尽管输了比赛，然而胜败乃兵家常事，只要再接再厉，终有成功的一天。'
+          }
+        ],
+        speech: '谚语学习：胜败乃兵家常事。意思是成功与失败都是生活常有的事，劝勉人们不要把偶然一次的胜利失败看得太重。'
+      },
+
+      // --- 模块四：语法《“一”字的变调规则》 ---
+      {
+        id: 'f23', mod: 'grammar', label: '“一”字变调',
+        title: '语法魔法：“一”字的变调规则',
+        tip: '“一”是个魔术师！它会根据后面的字声调变身哦！口诀：单用序数读第一，四声前面变第二，一二三前变第四，夹在中间读轻声！',
+        rules: [
+          { tone: '读第 1 声 (yī)', color: 'bg-emerald-100 text-emerald-900 border-emerald-300', desc: '单用、在词尾或作序数（第一、第二）时', ex: '初一、第一、万一、一米六、三十一' },
+          { tone: '读第 2 声 (yí 音“移”)', color: 'bg-sky-100 text-sky-900 border-sky-300', desc: '在【第四声】字前面，变读第二声', ex: '一个 (yí gè)、一次、一切、一样、一定、一路' },
+          { tone: '读第 4 声 (yì 音“意”)', color: 'bg-amber-100 text-amber-900 border-amber-300', desc: '在【第一、二、三声】字前面，变读第四声', ex: '一般 (yì bān)、一天、一心、一同、一起、一种' },
+          { tone: '读轻声 (yi)', color: 'bg-purple-100 text-purple-900 border-purple-300', desc: '夹在重叠动词中间时，念轻声', ex: '看一看、歇一歇、说一说、读一读、想一想' }
+        ],
+        speech: '“一”字的变调规则。第一，单用或序数念第一声：初一、第一。第二，在第四声字前变读第二声：一个、一次、一定。第三，在一、二、三声字前变读第四声：一般、一天、一起。第四，夹在重叠动词中间念轻声：看一看、想一想。'
+      },
+
+      // --- 模块五：趣味作文《日记魔法学院》 ---
+      {
+        id: 'f24', mod: 'diary', label: '趣味日记学院',
+        title: '🕵️‍♂️ 小侦探日记魔法学院 (Panduan Menulis Diari)',
+        tip: '日记是写给自己看的秘密百宝箱！不用太严肃，想写什么开心事、烦恼事都可以！',
+        diaryTypes: [
+          {
+            badge: '📋 1. 简录式 (流水账小清单)',
+            color: 'bg-sky-50 border-sky-200',
+            desc: '简要地记录一天的活动内容（像小侦探记行程表一样清楚）。',
+            sample: '早上 7 点起床刷牙，8 点去学校上华文课，下午和朋友下象棋，晚上复习功课。'
+          },
+          {
+            badge: '🔍 2. 随感式 (心情放大镜)',
+            color: 'bg-amber-50 border-amber-200',
+            desc: '着重写自己看到、听到后的感想和心情（把开心或难过放大写出来）。',
+            sample: '今天下棋虽然输了，但我一点也不气馁，因为“胜败乃兵家常事”，下次我一定会赢回来！'
+          },
+          {
+            badge: '🌟 3. 重点式 (超级大事件特写)',
+            color: 'bg-rose-50 border-rose-200',
+            desc: '把一天中最有意义、最难忘的一件事详细写下来！',
+            sample: '今天学校举办象棋比赛，我和对手大战了三十个回合，最后险胜一招，真是太刺激了！'
+          }
+        ],
+        speech: '欢迎来到小侦探日记魔法学院！日记有三种有趣写法：第一种，简录式，简要记录一天的活动清单；第二种，随感式，像心情放大镜一样写自己的感想；第三种，重点式，把一天中最有意义的一件事详细写下来。记得第一行要写上日期、星期和天气哦！'
+      }
+    ];
+
+    // =========================================================================
+    // 2. 三步连环闯关题库（覆盖全部 15 个核心生字 + 成语 + 语法）
+    //    每组核心词汇依次包含：第1步选词填空 -> 第2步词义配对 -> 第3步构词雷达(6选多)
+    // =========================================================================
+    const BASE_QUIZ = [
+      // --- 词汇组 1：【杂】 ---
+      {
+        id: 'q1', step: '第 1 步：选词填空', target: '杂',
+        prompt: '这名老中医医术了得 (hebat)，专治各种 (pelbagai) ______。',
+        speech: '选词填空：这名老中医医术了得，专治各种什么？',
+        options: ['疑难杂症', '勾肩搭背', '棋艺精湛', '孤零零'],
+        answer: '疑难杂症',
+        explain: '“疑难杂症 (penyakit rumit)” 指各种病理不明或难治的病，老中医专治各种疑难杂症。'
+      },
+      {
+        id: 'q2', step: '第 2 步：词义配对', target: '杂',
+        prompt: '请选择词语【疑难杂症 (yí nán zá zhèng)】相等的正确华语解释：',
+        speech: '词义配对：请选择词语“疑难杂症”相等的正确解释。',
+        options: [
+          '各种病理不明或难治的病 (penyakit rumit)',
+          '下棋的技艺 (kemahiran catur)',
+          '相隔的长度 (jarak)',
+          '使人敬畏的声势或气派 (kewibawaan)'
+        ],
+        answer: '各种病理不明或难治的病 (penyakit rumit)',
+        explain: '课本释义：“疑难杂症”指各种病理不明或难治的病。'
+      },
+      {
+        id: 'q3', step: '第 3 步：构词雷达 (6选多)', target: '杂',
+        prompt: '请选出【所有】与生字“杂 (zá)”相关的正确构词（共3个，全选对才算过关）：',
+        speech: '构词雷达：请选出所有与生字“杂”相关的正确构词。',
+        options: [
+          { text: '杂事 (kerja rencam)', ok: true },
+          { text: '花朵 (bunga)', ok: false },
+          { text: '杂乱 (bersepah)', ok: true },
+          { text: '云朵 (awan)', ok: false },
+          { text: '杂货店 (kedai runcit)', ok: true },
+          { text: '耳朵 (telinga)', ok: false }
+        ],
+        explain: '“杂”的正确构词有：杂事、杂乱、杂货店。另外三个都是形似字“朵”(duǒ)哦！'
+      },
+
+      // --- 词汇组 2：【艺 / 仿 / 协】 ---
+      {
+        id: 'q4', step: '第 1 步：选词填空', target: '艺',
+        prompt: '哥哥参加了象棋学会 (persatuan catur)，钻研 (mendalami) ______。',
+        speech: '选词填空：哥哥参加了象棋学会，钻研什么？',
+        options: ['棋艺', '距离', '遭遇', '威风'],
+        answer: '棋艺',
+        explain: '“棋艺 (kemahiran bermain catur)” 指下棋的技艺。'
+      },
+      {
+        id: 'q5', step: '第 1 步：选词填空', target: '仿',
+        prompt: '爸爸是个工作狂，一干起活来就______ (seolah-olah / bagaikan) 不知道饥饿和疲倦了。',
+        speech: '选词填空：爸爸是个工作狂，一干起活来就怎样不知道饥饿和疲倦了？',
+        options: ['仿佛', '拒绝', '拥戴', '输掉'],
+        answer: '仿佛',
+        explain: '“仿佛 (seolah-olah)” 意思是似乎、好像，同义词是“好像”。'
+      },
+      {
+        id: 'q6', step: '第 2 步：词义配对', target: '协',
+        prompt: '请选择词语【协调 (xié tiáo)】相等的正确华语解释：',
+        speech: '词义配对：请选择词语“协调”相等的正确解释。',
+        options: [
+          '使配合得适当 (selaras / harmoni)',
+          '不接受请求或意见 (menolak)',
+          '形容孤单无依无靠 (keseorangan)',
+          '比较起来稍微好一点 (sedikit lebih baik)'
+        ],
+        answer: '使配合得适当 (selaras / harmoni)',
+        explain: '“协调”的意思是使配合得适当（如手脚协调）。'
+      },
+      {
+        id: 'q7', step: '第 3 步：构词雷达 (6选多)', target: '协',
+        prompt: '请选出【所有】与生字“协 (xié)”相关的正确构词（共3个）：',
+        speech: '构词雷达：请选出所有与生字“协”相关的正确构词。',
+        options: [
+          { text: '协助 (membantu)', ok: true },
+          { text: '皮鞋 (kasut kulit)', ok: false },
+          { text: '协和 (harmoni)', ok: true },
+          { text: '斜坡 (cerun)', ok: false },
+          { text: '协议 (perjanjian)', ok: true },
+          { text: '谢谢 (terima kasih)', ok: false }
+        ],
+        explain: '“协”的正确构词有：协助、协和、协议。'
+      },
+
+      // --- 词汇组 3：【输 / 拒 / 绝】 ---
+      {
+        id: 'q8', step: '第 1 步：选词填空', target: '拒',
+        prompt: '小明要独自出门玩耍，被妈妈______ (tidak dibenarkan / ditolak) 了。',
+        speech: '选词填空：小明要独自出门玩耍，被妈妈怎样了？',
+        options: ['拒绝', '拥戴', '协调', '模仿'],
+        answer: '拒绝',
+        explain: '“拒绝 (menolak)” 指不接受请求、意见或赠礼，反义词是“接受”。'
+      },
+      {
+        id: 'q9', step: '第 2 步：词义配对', target: '输',
+        prompt: '“哥哥在比赛中【输】了一球。” 这里的“输”是什么意思？反义词是什么？',
+        speech: '词义配对：这里的输是什么意思，反义词是什么？',
+        options: [
+          '在较量时失败；反义词是“赢” (kalah × menang)',
+          '运输货物；反义词是“买”',
+          '靠近紧接着；反义词是“远”',
+          '拥护推戴；反义词是“接受”'
+        ],
+        answer: '在较量时失败；反义词是“赢” (kalah × menang)',
+        explain: '“输”指在较量时失败，同义词是“败”，反义词是“赢”。'
+      },
+      {
+        id: 'q10', step: '第 3 步：构词雷达 (6选多)', target: '拒 / 绝',
+        prompt: '请选出【所有】与“拒”或“绝”相关的正确构词（共3个）：',
+        speech: '构词雷达：请选出所有与“拒”或“绝”相关的正确构词。',
+        options: [
+          { text: '抗拒 (menentang)', ok: true },
+          { text: '相距 (berjarak)', ok: false },
+          { text: '绝妙 (sangat bijak)', ok: true },
+          { text: '决定 (keputusan)', ok: false },
+          { text: '回绝 (menolak)', ok: true },
+          { text: '距离 (jarak)', ok: false }
+        ],
+        explain: '“抗拒、绝妙、回绝”都用“拒/绝”；“相距、距离”是足字旁的“距”，“决定”是两点水的“决”！'
+      },
+
+      // --- 词汇组 4：【距 / 孤 / 挨 / 勾】 ---
+      {
+        id: 'q11', step: '第 1 步：选词填空', target: '距',
+        prompt: '为了不被发现，侦探 (detektif) 在跟踪目标人物时都保持______ (jarak)。',
+        speech: '选词填空：为了不被发现，侦探在跟踪目标人物时都保持什么？',
+        options: ['距离', '棋艺', '威风', '磨练'],
+        answer: '距离',
+        explain: '“距离 (jarak)” 指相隔的长度，用足字旁“距”。'
+      },
+      {
+        id: 'q12', step: '第 1 步：选词填空', target: '孤',
+        prompt: '老伯伯的孩子都移居国外了，剩下他______ (seorang diri / keseorangan) 一人住在乡下。',
+        speech: '选词填空：老伯伯的孩子都移居国外了，剩下他怎样一人住在乡下？',
+        options: ['孤零零', '谈笑风生', '趾高气扬', '勾肩搭背'],
+        answer: '孤零零',
+        explain: '“孤零零 (keseorangan)” 形容孤单，无依无靠或没有陪衬。'
+      },
+      {
+        id: 'q13', step: '第 1 步：选词填空', target: '挨',
+        prompt: '我家______ (bersebelahan / rapat) 学校，所以每天自行走路去上学，无需人接送。',
+        speech: '选词填空：我家怎样学校，所以每天自行走路去上学？',
+        options: ['挨着', '拒绝', '遭遇', '输给'],
+        answer: '挨着',
+        explain: '“挨 (āi)” 意思是靠近、紧接着，“挨着学校”就是紧靠着学校。'
+      },
+      {
+        id: 'q14', step: '第 2 步：词义配对', target: '勾',
+        prompt: '请选择词语【勾肩搭背 (gōu jiān dā bèi)】相等的正确华语解释：',
+        speech: '词义配对：请选择词语“勾肩搭背”相等的正确解释。',
+        options: [
+          '彼此把手搭在对方的肩上或背上，形容亲昵的状态',
+          '形容骄傲自满，得意忘形',
+          '形容大家的眼睛都注视着',
+          '在艰难困苦的环境中锻炼'
+        ],
+        answer: '彼此把手搭在对方的肩上或背上，形容亲昵的状态',
+        explain: '“勾肩搭背”指好朋友之间彼此把手搭在对方的肩上或背上，形容非常亲昵。'
+      },
+      {
+        id: 'q15', step: '第 3 步：构词雷达 (6选多)', target: '孤',
+        prompt: '请选出【所有】与生字“孤 (gū，子字旁)”相关的正确构词（共3个）：',
+        speech: '构词雷达：请选出所有与生字“孤”相关的正确构词。',
+        options: [
+          { text: '孤独 (sunyi)', ok: true },
+          { text: '狐狸 (musang)', ok: false },
+          { text: '孤单 (seorang diri)', ok: true },
+          { text: '水壶 (cerek air)', ok: false },
+          { text: '孤儿 (anak yatim)', ok: true },
+          { text: '胡须 (misai)', ok: false }
+        ],
+        explain: '“孤独、孤单、孤儿”都是子字旁的“孤”；“狐狸”是反犬旁的“狐”！'
+      },
+
+      // --- 词汇组 5：【遭 / 威 / 拥 / 磨】 ---
+      {
+        id: 'q16', step: '第 1 步：选词填空', target: '遭',
+        prompt: '安徒生从丑小鸭坎坷悲惨的______ (nasib malang) 中，暗示着当时社会的环境状况。',
+        speech: '选词填空：安徒生从丑小鸭坎坷悲惨的什么中，暗示着当时社会的环境状况？',
+        options: ['遭遇', '棋艺', '拥戴', '距离'],
+        answer: '遭遇',
+        explain: '“遭遇 (nasib)” 指遇到的事情，多指不幸的经历。'
+      },
+      {
+        id: 'q17', step: '第 1 步：选词填空', target: '威',
+        prompt: '我们必须要有信心，不能长他人的志气，灭自己的______ (kewibawaan / semangat)。',
+        speech: '选词填空：我们必须要有信心，不能长他人的志气，灭自己的什么？',
+        options: ['威风', '杂事', '孤单', '协议'],
+        answer: '威风',
+        explain: '“威风 (kewibawaan)” 指使人敬畏的声势或气派。'
+      },
+      {
+        id: 'q18', step: '第 1 步：选词填空', target: '拥',
+        prompt: '村长为发展村庄劳心劳力，深得村民的______ (sokongan padu)。',
+        speech: '选词填空：村长为发展村庄劳心劳力，深得村民的什么？',
+        options: ['拥戴', '拒绝', '抛弃', '怀疑'],
+        answer: '拥戴',
+        explain: '“拥戴 (menyokong)” 指拥护推戴，反义词是“摒弃”。'
+      },
+      {
+        id: 'q19', step: '第 1 步：选词填空', target: '磨',
+        prompt: '只有经历地狱般的______ (latihan yang mencabar)，才能炼出创造天堂的力量。',
+        speech: '选词填空：只有经历地狱般的什么，才能炼出创造天堂的力量？',
+        options: ['磨练', '模仿', '勾画', '杂乱'],
+        answer: '磨练',
+        explain: '“磨练 (melatih diri)” 指在艰难困苦的环境中锻炼，同义词是“锻炼”。'
+      },
+      {
+        id: 'q20', step: '第 3 步：构词雷达 (6选多)', target: '拥 / 磨',
+        prompt: '请选出【所有】与“拥”或“磨”相关的正确构词（共3个）：',
+        speech: '构词雷达：请选出所有与“拥”或“磨”相关的正确构词。',
+        options: [
+          { text: '拥抱 (memeluk)', ok: true },
+          { text: '勇敢 (berani)', ok: false },
+          { text: '磨损 (haus)', ok: true },
+          { text: '魔鬼 (syaitan)', ok: false },
+          { text: '折磨 (menyeksa)', ok: true },
+          { text: '游泳 (berenang)', ok: false }
+        ],
+        explain: '“拥抱、磨损、折磨”是正确构词；“魔鬼”是鬼字底的“魔”，不是“磨”哦！'
+      },
+
+      // --- 成语、谚语与“一”字变调 ---
+      {
+        id: 'q21', step: '成语与谚语', target: '略胜一筹',
+        prompt: '这场足球赛虽然踢平了，但从两队的技术水平看，客队还是______ (sedikit lebih baik)。',
+        speech: '成语填空：从两队的技术水平看，客队还是怎样？',
+        options: ['略胜一筹', '趾高气扬', '口沫横飞', '锋芒毕露'],
+        answer: '略胜一筹',
+        explain: '“略胜一筹”意思是：比较起来，稍微好一点。'
+      },
+      {
+        id: 'q22', step: '成语与谚语', target: '胜败乃兵家常事',
+        prompt: '尽管输了比赛，然而______ (menang atau kalah perkara biasa)，只要再接再厉，终有成功的一天。',
+        speech: '谚语填空：尽管输了比赛，然而什么，只要再接再厉，终有成功的一天？',
+        options: ['胜败乃兵家常事', '众目睽睽之下', '名列前茅', '高谈阔论'],
+        answer: '胜败乃兵家常事',
+        explain: '“胜败乃兵家常事”劝勉人们不要把偶然一次的胜利或失败看得太重。'
+      },
+      {
+        id: 'q23', step: '语法：“一”变调', target: '“一”字变调',
+        prompt: '词语【一个 (yí gè)】中的“一”字，因为后面跟着第四声的“个”，所以“一”必须变读成第几声？',
+        speech: '语法变调：词语“一个”中的“一”字，必须变读成第几声？',
+        options: ['第二声 (yí，音“移”)', '第一声 (yī)', '第四声 (yì，音“意”)', '轻声 (yi)'],
+        answer: '第二声 (yí，音“移”)',
+        explain: '变调口诀：在第四声字前面的“一”，变读第二声，音“移”（如：一个 yí gè、一次 yí cì）。'
+      },
+      {
+        id: 'q24', step: '趣味日记知识', target: '日记写法',
+        prompt: '写日记时，如果想【把一天中最有意义、最难忘的一件事详细写下来】，这种写法叫做：',
+        speech: '日记小侦探：把一天中最有意义的一件事详细写下来，这种写法叫做什么？',
+        options: ['重点式 (超级大事件特写)', '简录式 (流水账小清单)', '随感式 (心情放大镜)'],
+        answer: '重点式 (超级大事件特写)',
+        explain: '日记三种写法：简录式记录活动清单，随感式写感想，重点式把一天中最有意义的一件事详细写下来！'
+      }
+    ];
+
+    // =========================================================================
+    // 3. 全局状态与仪表盘统计
+    // =========================================================================
+    let state = {
+      teacherMode: false,
+      speechRate: 0.85,
+      bgmEnabled: false,
+      bgmPanic: false,
+
+      // 左侧闪卡状态
+      currentCardIdx: 0,
+      readCardIds: new Set(), // 记录已完整阅读满 5 秒的卡片 ID
+      cardTimer: null,
+      cardSecLeft: 5,
+      gateUnlocked: false,
+
+      // 右侧答题状态
+      quizQueue: [...BASE_QUIZ],
+      currentQuizIdx: 0,
+      score: 0,
+      streak: 0,
+      totalCorrect: 0,
+      firstAttemptTotal: 0,
+      firstAttemptCleanCount: 0,
+      pendingErrorIds: new Set(), // 当前待消灭的错题ID集合
+
+      // 答题计时器状态
+      phase: 'locked', // 'locked' | 'reading_lock' | 'answering' | 'answered'
+      quizTimer: null,
+      quizSecLeft: 5,
+      currentIsClean: true,
+      multiSelected: new Set(),
+
+      // 技能栏
+      skills: { freeze: 0, xray: 0, double: 0, shield: 0 },
+      doubleTurns: 0
+    };
+
+    // =========================================================================
+    // 4. Web Audio API 马林巴轻快背景音 & 最后10秒紧张心跳切换
+    // =========================================================================
+    let audioCtx = null;
+    let bgmTimeout = null;
+    let noteStep = 0;
+
+    function ensureAudio() {
+      if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+    }
+
+    function playNote(freq, dur, type = 'sine', vol = 0.08) {
+      if (!audioCtx) return;
+      try {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+        gain.gain.setValueAtTime(vol, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + dur);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + dur);
+      } catch (e) {}
+    }
+
+    const SFX = {
+      tap: () => { ensureAudio(); playNote(587.33, 0.07, 'triangle', 0.07); },
+      correct: () => {
+        ensureAudio();
+        [523.25, 659.25, 783.99, 1046.5].forEach((f, i) => setTimeout(() => playNote(f, 0.16, 'sine', 0.11), i * 85));
+      },
+      wrong: () => {
+        ensureAudio();
+        playNote(230, 0.18, 'sawtooth', 0.09);
+        setTimeout(() => playNote(180, 0.26, 'sawtooth', 0.09), 150);
+      },
+      unlock: () => {
+        ensureAudio();
+        [440, 554.37, 659.25, 880].forEach((f, i) => setTimeout(() => playNote(f, 0.22, 'triangle', 0.12), i * 100));
+      },
+      tickPanic: () => { ensureAudio(); playNote(920, 0.06, 'square', 0.06); }
+    };
+
+    const MARIMBA_NOTES = [523.25, 659.25, 783.99, 1046.50, 783.99, 659.25, 587.33, 698.46];
+    const PANIC_NOTES = [440, 466.16, 440, 523.25, 440, 466.16, 587.33, 493.88];
+
+    function runBGMLoop() {
+      if (bgmTimeout) clearTimeout(bgmTimeout);
+      const stepFn = () => {
+        if (!state.bgmEnabled) return;
+        ensureAudio();
+        if (state.bgmPanic) {
+          // 紧张模式：急促警报鼓点 + 高频心跳
+          const f = PANIC_NOTES[noteStep % PANIC_NOTES.length];
+          playNote(f, 0.13, 'triangle', 0.065);
+          if (noteStep % 2 === 0) playNote(98, 0.1, 'sine', 0.11);
+          noteStep++;
+          bgmTimeout = setTimeout(stepFn, 210);
+        } else {
+          // 轻松马林巴/八音盒旋律
+          const f = MARIMBA_NOTES[noteStep % MARIMBA_NOTES.length];
+          playNote(f, 0.3, 'sine', 0.045);
+          noteStep++;
+          bgmTimeout = setTimeout(stepFn, 500);
+        }
+      };
+      stepFn();
+    }
+
+    function toggleBGM() {
+      state.bgmEnabled = !state.bgmEnabled;
+      const icon = document.getElementById('bgmIcon');
+      const txt = document.getElementById('bgmText');
+      if (state.bgmEnabled) {
+        ensureAudio();
+        icon.textContent = '🎵';
+        txt.textContent = '音乐开启';
+        runBGMLoop();
+      } else {
+        icon.textContent = '🔇';
+        txt.textContent = '开启音乐';
+        if (bgmTimeout) clearTimeout(bgmTimeout);
+      }
+    }
+
+    // =========================================================================
+    // 5. 中文 TTS 语音朗读
+    // =========================================================================
+    function speakText(raw) {
+      if (!('speechSynthesis' in window)) return;
+      window.speechSynthesis.cancel();
+      const cleaned = raw.replace(/\([a-zA-Z\s\/\-&]+\)/g, '');
+      const u = new SpeechSynthesisUtterance(cleaned);
+      u.lang = 'zh-CN';
+      u.rate = state.speechRate;
+      u.pitch = 1.05;
+      window.speechSynthesis.speak(u);
+    }
+
+    function toggleSpeechRate() {
+      SFX.tap();
+      state.speechRate = state.speechRate === 0.85 ? 1.0 : 0.85;
+      document.getElementById('speechRateLabel').textContent = state.speechRate === 0.85 ? '慢速 0.85x' : '常速 1.0x';
+    }
+
+    function speakCurrentCard() {
+      speakText(FLASHCARDS[state.currentCardIdx].speech);
+    }
+
+    function speakCurrentQuiz() {
+      const q = state.quizQueue[state.currentQuizIdx];
+      if (q) speakText(q.speech);
+    }
+
+    // =========================================================================
+    // 6. 左侧闪卡渲染与 5 秒强制学习闭环
+    // =========================================================================
+    function updateDashboard() {
+      const totalCards = FLASHCARDS.length;
+      const readCount = state.readCardIds.size;
+      const remain = totalCards - readCount;
+
+      document.getElementById('dashCards').textContent = `${readCount}/${totalCards}`;
+      document.getElementById('dashStreak').textContent = state.streak;
+      document.getElementById('dashScore').textContent = state.score;
+      document.getElementById('dashPendingErrors').textContent = state.pendingErrorIds.size;
+
+      const acc = state.firstAttemptTotal === 0 ? 100 : Math.round((state.firstAttemptCleanCount / state.firstAttemptTotal) * 100);
+      document.getElementById('dashAccuracy').textContent = `${acc}%`;
+
+      document.getElementById('remainingCardsPrompt').textContent = `（剩余 ${remain} 张未完成阅读）`;
+
+      // 检查是否全部 24 张闪卡都已完成阅读
+      if (remain === 0 && !state.gateUnlocked) {
+        unlockRightQuizGate();
+      }
+    }
+
+    function renderFlashcard() {
+      const card = FLASHCARDS[state.currentCardIdx];
+      const total = FLASHCARDS.length;
+      const isRead = state.readCardIds.has(card.id);
+
+      document.getElementById('cardIndexText').textContent = `第 ${state.currentCardIdx + 1} / ${total} 张`;
+
+      const badge = document.getElementById('cardReadBadge');
+      if (isRead) {
+        badge.className = 'px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-300 text-xs font-black';
+        badge.textContent = '已解锁 ✓';
+      } else {
+        badge.className = 'px-2.5 py-1 rounded-full bg-amber-100 text-amber-800 border border-amber-300 text-xs font-bold';
+        badge.textContent = '⏳ 学习中';
+      }
+
+      // 高亮所属模块标签
+      document.querySelectorAll('.mod-tab').forEach(btn => {
+        if (btn.dataset.mod === card.mod) {
+          btn.className = 'mod-tab py-1.5 px-1 rounded-xl text-[11px] sm:text-xs font-black bg-emerald-700 text-white text-center shadow transition';
+        } else {
+          btn.className = 'mod-tab py-1.5 px-1 rounded-xl text-[11px] sm:text-xs font-bold bg-stone-200 hover:bg-stone-300 text-stone-700 text-center transition';
+        }
+      });
+
+      const container = document.getElementById('flashcardContent');
+
+      if (card.mod === 'vocab') {
+        container.innerHTML = `
+          <div>
+            <!-- 田字格生字 + 拼音 + 独立朗读按钮 -->
+            <div class="flex items-center gap-4 pb-3 border-b border-amber-100">
+              <div class="tian-zi-ge w-20 h-20 sm:w-24 sm:h-24 rounded-2xl flex items-center justify-center shrink-0">
+                <span class="text-5xl sm:text-6xl font-black text-emerald-950">${card.char}</span>
+              </div>
+              <div class="flex-1">
+                <div class="flex flex-wrap items-center gap-2 mb-1">
+                  <span class="text-xl sm:text-2xl font-black text-amber-700">${card.pinyin}</span>
+                  <button onclick="speakText('${card.char}，${card.meaning}')" class="px-2.5 py-1 rounded-full bg-sky-100 hover:bg-sky-200 text-sky-800 text-xs font-bold">
+                    🔊 读字音
+                  </button>
+                </div>
+                <div class="flex gap-2 text-xs text-stone-500 font-bold mb-2">
+                  <span class="bg-stone-100 px-2 py-0.5 rounded">部首：${card.radical}</span>
+                  <span class="bg-stone-100 px-2 py-0.5 rounded">笔画：${card.strokes}</span>
+                </div>
+                <div class="text-xs sm:text-sm font-bold text-emerald-950 bg-emerald-50 border border-emerald-200 rounded-xl px-3 py-1.5">
+                  📌 课文词义：${card.meaning}
+                </div>
+              </div>
+            </div>
+
+            <!-- 趣味记忆口诀/拆字法 -->
+            <div class="mt-3 bg-amber-50 border border-amber-200 rounded-xl p-2.5">
+              <div class="text-xs font-black text-amber-800 mb-0.5">💡 趣味拆字记忆口诀：</div>
+              <p class="text-xs sm:text-sm text-stone-700 leading-relaxed">${card.tip}</p>
+            </div>
+
+            <!-- 构词双语详解（点击可单独朗读） -->
+            <div class="mt-3">
+              <div class="text-xs font-black text-indigo-950 mb-1.5">🧩 构词双语详解（点击卡片可单独朗读）：</div>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
+                ${card.words.map(item => `
+                  <button onclick="speakText('${item.w}')" class="text-left bg-indigo-50/75 hover:bg-indigo-100 border border-indigo-200 rounded-xl px-3 py-1.5 transition">
+                    <div class="font-black text-xs sm:text-sm text-indigo-950 flex items-center justify-between">
+                      <span>${item.w}</span>
+                      <span class="text-[11px] text-sky-600">🔊</span>
+                    </div>
+                    <div class="text-[11px] text-stone-600">${item.m}</div>
+                  </button>
+                `).join('')}
+              </div>
+            </div>
+          </div>
+
+          <!-- 例句 -->
+          <div class="mt-3 pt-2.5 border-t border-stone-100 bg-stone-50 rounded-xl p-2.5 flex items-start justify-between gap-2">
+            <div class="text-xs sm:text-sm text-stone-800 leading-relaxed">
+              <span class="font-black text-emerald-700">📖 例句：</span>${card.example}
+            </div>
+            <button onclick="speakText('${card.example}')" class="shrink-0 px-2.5 py-1.5 rounded-lg bg-emerald-100 hover:bg-emerald-200 text-emerald-800 text-xs font-bold">
+              🔊 读例句
+            </button>
+          </div>
+        `;
+      } else if (card.mod === 'compare') {
+        let inner = '';
+        if (card.pairs) {
+          inner = `<div class="space-y-2 mt-3">${card.pairs.map(p => `
+            <div class="flex items-center justify-between bg-stone-50 border border-stone-200 rounded-xl px-3 py-2 text-xs sm:text-sm">
+              <span class="px-2 py-0.5 rounded font-bold ${p.type.includes('同') ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'}">${p.type}</span>
+              <span class="font-black text-base text-stone-900">${p.left} <span class="text-amber-600 mx-1">${p.type.includes('同') ? '=' : '×'}</span> ${p.right}</span>
+              <span class="text-xs text-stone-500">(${p.malay})</span>
+            </div>`).join('')}</div>`;
+        } else if (card.polyphones) {
+          inner = `<div class="space-y-2.5 mt-3">${card.polyphones.map(p => `
+            <div class="bg-sky-50 border border-sky-200 rounded-xl p-3">
+              <div class="font-black text-base text-sky-950 mb-1">多音字：【 ${p.char} 】</div>
+              <div class="text-xs sm:text-sm text-stone-800 space-y-1">
+                <div class="bg-white px-2.5 py-1 rounded border border-sky-100">① ${p.r1}</div>
+                <div class="bg-white px-2.5 py-1 rounded border border-sky-100">② ${p.r2}</div>
+              </div>
+            </div>`).join('')}</div>`;
+        } else if (card.homophones) {
+          inner = `<div class="space-y-2.5 mt-3">${card.homophones.map(h => `
+            <div class="bg-indigo-50 border border-indigo-200 rounded-xl p-3">
+              <div class="font-black text-xs text-indigo-800 mb-1">同音字读音：【 ${h.py} 】</div>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs sm:text-sm font-bold">
+                <div class="bg-white p-2 rounded border border-indigo-100">🅰️ ${h.a}</div>
+                <div class="bg-white p-2 rounded border border-indigo-100">🅱️ ${h.b}</div>
+              </div>
+            </div>`).join('')}</div>`;
+        } else if (card.lookalikes) {
+          inner = `<div class="space-y-2.5 mt-3">${card.lookalikes.map(l => `
+            <div class="bg-amber-50 border border-amber-200 rounded-xl p-3">
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 font-black text-xs sm:text-sm mb-1.5">
+                <div class="bg-white p-2 rounded border border-amber-200">① ${l.a}</div>
+                <div class="bg-white p-2 rounded border border-amber-200">② ${l.b}</div>
+              </div>
+              <div class="text-xs text-amber-900 font-bold">🔍 辨认秘诀：${l.tip}</div>
+            </div>`).join('')}</div>`;
+        }
+        container.innerHTML = `
+          <div>
+            <h3 class="text-lg font-black text-emerald-950 font-fun">${card.title}</h3>
+            <p class="mt-1.5 text-xs text-amber-900 bg-amber-50 border border-amber-200 rounded-xl p-2">💡 ${card.tip}</p>
+            ${inner}
+          </div>
+        `;
+      } else if (card.mod === 'idiom') {
+        container.innerHTML = `
+          <div>
+            <h3 class="text-lg font-black text-emerald-950 font-fun mb-2">${card.title}</h3>
+            <div class="space-y-2.5 max-h-[395px] overflow-y-auto pr-1">
+              ${card.idioms.map(item => `
+                <div class="bg-stone-50 border border-stone-200 rounded-xl p-3">
+                  <div class="flex flex-wrap items-center justify-between gap-1 mb-1">
+                    <span class="font-black text-sm sm:text-base text-indigo-950">${item.term}</span>
+                    <button onclick="speakText('${item.term}。${item.meaning}')" class="px-2 py-0.5 rounded bg-sky-100 text-sky-800 text-xs font-bold">🔊 朗读</button>
+                  </div>
+                  <div class="text-[11px] font-bold text-amber-800 bg-amber-100/70 inline-block px-2 py-0.5 rounded mb-1">${item.malay}</div>
+                  <div class="text-xs text-emerald-900 font-bold mb-1">释义：${item.meaning}</div>
+                  <div class="text-xs text-stone-600">例句：${item.sentence}</div>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+        `;
+      } else if (card.mod === 'grammar') {
+        container.innerHTML = `
+          <div>
+            <h3 class="text-lg font-black text-emerald-950 font-fun mb-1.5">${card.title}</h3>
+            <div class="bg-amber-50 border border-amber-200 rounded-xl p-2.5 text-xs text-amber-950 font-bold mb-2.5">
+              🎵 变调口诀：${card.tip}
+            </div>
+            <div class="space-y-2">
+              ${card.rules.map(r => `
+                <div class="border rounded-xl p-2.5 text-xs ${r.color}">
+                  <div class="flex items-center justify-between font-black text-sm mb-0.5">
+                    <span>${r.tone}</span>
+                    <button onclick="speakText('${r.ex}')" class="px-2 py-0.5 rounded bg-white/80 text-xs font-bold">🔊 听对比</button>
+                  </div>
+                  <div class="font-bold opacity-90 mb-0.5">规则：${r.desc}</div>
+                  <div class="font-black">例子：${r.ex}</div>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+        `;
+      } else if (card.mod === 'diary') {
+        container.innerHTML = `
+          <div>
+            <h3 class="text-lg font-black text-emerald-950 font-fun mb-1">${card.title}</h3>
+            <p class="text-xs text-amber-900 bg-amber-50 border border-amber-200 rounded-xl p-2 mb-2">${card.tip}</p>
+
+            <!-- 趣味日记格式小拼图 -->
+            <div class="bg-emerald-900 text-amber-100 rounded-xl p-2.5 mb-2.5 text-xs">
+              <div class="font-black text-amber-300 mb-1">📐 日记标准格式（第一行必写三宝）：</div>
+              <div class="bg-white text-stone-800 rounded-lg p-2 font-bold flex justify-between border-2 border-dashed border-amber-400">
+                <span>📅 2026年11月26日</span>
+                <span>🗓️ 星期四</span>
+                <span>☀️ 晴</span>
+              </div>
+              <div class="text-[11px] text-emerald-200 mt-1">另起一行空两格写正文，分自然段，写实情最棒！</div>
+            </div>
+
+            <!-- 三种日记写法漫画卡片 -->
+            <div class="space-y-2">
+              ${card.diaryTypes.map(d => `
+                <div class="border rounded-xl p-2.5 text-xs ${d.color}">
+                  <div class="font-black text-stone-900 text-sm mb-0.5">${d.badge}</div>
+                  <div class="text-stone-700 mb-1">${d.desc}</div>
+                  <div class="bg-white/80 rounded-lg p-1.5 text-stone-800 italic">💬 示例：“${d.sample}”</div>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+        `;
+      }
+
+      document.getElementById('prevCardBtn').disabled = state.currentCardIdx === 0;
+      startCardFiveSecondLock();
+    }
+
+    function startCardFiveSecondLock() {
+      if (state.cardTimer) clearInterval(state.cardTimer);
+
+      const card = FLASHCARDS[state.currentCardIdx];
+      const nextBtn = document.getElementById('nextCardBtn');
+      const nextLabel = document.getElementById('nextCardLabel');
+      const hint = document.getElementById('cardLockHint');
+      const secEl = document.getElementById('cardLockSec');
+      const barEl = document.getElementById('cardLockBar');
+
+      const isLast = state.currentCardIdx === FLASHCARDS.length - 1;
+
+      // 如果该卡已经读满5秒，或开启了教师演示模式，立即解锁
+      if (state.readCardIds.has(card.id) || state.teacherMode) {
+        state.readCardIds.add(card.id);
+        updateDashboard();
+        nextBtn.disabled = false;
+        nextLabel.textContent = isLast ? '进入闯关挑战 🎉' : '下一张';
+        hint.textContent = '✅ 本张闪卡已解锁！你可以随时翻页或点击喇叭重听。';
+        secEl.textContent = '✓';
+        barEl.style.width = '100%';
+        return;
+      }
+
+      // 严格执行 5 秒强制阅读倒计时
+      state.cardSecLeft = 5;
+      nextBtn.disabled = true;
+      nextLabel.textContent = '请阅读 (5s)';
+      hint.textContent = '⏳ 认真看一看、点“朗读”听发音（还需 5 秒解锁下一张）';
+      secEl.textContent = '5s';
+      barEl.style.width = '0%';
+
+      state.cardTimer = setInterval(() => {
+        state.cardSecLeft--;
+        const pct = ((5 - state.cardSecLeft) / 5) * 100;
+        barEl.style.width = `${Math.min(100, pct)}%`;
+
+        if (state.cardSecLeft > 0) {
+          secEl.textContent = `${state.cardSecLeft}s`;
+          hint.textContent = `⏳ 认真看一看、点“朗读”听发音（还需 ${state.cardSecLeft} 秒解锁下一张）`;
+          nextLabel.textContent = `请阅读 (${state.cardSecLeft}s)`;
+        } else {
+          clearInterval(state.cardTimer);
+          state.readCardIds.add(card.id);
+          secEl.textContent = '已解锁 ✓';
+          hint.textContent = '🎉 5 秒阅读完成！本卡片已打上“已解锁 ✓”徽章！';
+          nextBtn.disabled = false;
+          nextLabel.textContent = isLast ? '解锁右侧闯关大门 🎉' : '下一张';
+
+          const badge = document.getElementById('cardReadBadge');
+          badge.className = 'px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-300 text-xs font-black';
+          badge.textContent = '已解锁 ✓';
+
+          SFX.tap();
+          updateDashboard();
+        }
+      }, 1000);
+    }
+
+    function nextCard() {
+      SFX.tap();
+      if (state.currentCardIdx < FLASHCARDS.length - 1) {
+        state.currentCardIdx++;
+        renderFlashcard();
+      } else {
+        // 如果还有前面跳过的未读卡，提示跳转；否则解锁闯关
+        const unreadIdx = FLASHCARDS.findIndex(c => !state.readCardIds.has(c.id));
+        if (unreadIdx !== -1 && !state.teacherMode) {
+          state.currentCardIdx = unreadIdx;
+          renderFlashcard();
+          showBannerToast('还有未完成 5 秒阅读的闪卡，已自动为你跳转！');
+        } else {
+          unlockRightQuizGate();
+        }
+      }
+    }
+
+    function prevCard() {
+      SFX.tap();
+      if (state.currentCardIdx > 0) {
+        state.currentCardIdx--;
+        renderFlashcard();
+      }
+    }
+
+    function switchModule(modName) {
+      const idx = FLASHCARDS.findIndex(c => c.mod === modName);
+      if (idx === -1) return;
+      SFX.tap();
+      state.currentCardIdx = idx;
+      renderFlashcard();
+    }
+
+    function jumpToFirstUnreadCard() {
+      SFX.tap();
+      const unreadIdx = FLASHCARDS.findIndex(c => !state.readCardIds.has(c.id));
+      if (unreadIdx !== -1) {
+        state.currentCardIdx = unreadIdx;
+        renderFlashcard();
+      }
+    }
+
+    function unlockRightQuizGate() {
+      if (state.gateUnlocked) return;
+      state.gateUnlocked = true;
+      SFX.unlock();
+
+      const overlay = document.getElementById('quizGateOverlay');
+      overlay.classList.add('opacity-0', 'pointer-events-none');
+      setTimeout(() => overlay.classList.add('hidden'), 500);
+
+      document.getElementById('rightQuizPanel').classList.add('gate-unlocked-glow');
+      loadQuizQuestion();
+    }
+
+    // =========================================================================
+    // 7. 右侧三步连环闯关训练场（5秒冷静审题 + 35秒紧张倒计时 + 100%正确率闭环）
+    // =========================================================================
+    function loadQuizQuestion() {
+      if (state.quizTimer) clearInterval(state.quizTimer);
+      state.bgmPanic = false;
+      state.currentIsClean = true;
+      state.multiSelected.clear();
+
+      if (state.currentQuizIdx >= state.quizQueue.length) {
+        showWinModal();
+        return;
+      }
+
+      const q = state.quizQueue[state.currentQuizIdx];
+      document.getElementById('quizStepPill').textContent = q.step;
+      document.getElementById('quizProgressPill').textContent = `第 ${state.currentQuizIdx + 1} / ${state.quizQueue.length} 题`;
+
+      const retryBadge = document.getElementById('retryBadge');
+      if (q.isRetryClone) retryBadge.classList.remove('hidden');
+      else retryBadge.classList.add('hidden');
+
+      document.getElementById('quizFeedbackPanel').classList.add('hidden');
+      document.getElementById('nextQuizBtn').classList.add('hidden');
+
+      renderQuizBody(q, true); // 初始 5 秒审题锁定
+
+      // 自动朗读题目，帮认字基础弱的学生听懂题干
+      speakText(q.speech);
+
+      if (state.teacherMode) {
+        beginAnswering35s();
+      } else {
+        beginReadingLock5s();
+      }
+    }
+
+    function renderQuizBody(q, locked) {
+      const box = document.getElementById('quizCardBody');
+      const isMulti = Array.isArray(q.options) && typeof q.options[0] === 'object';
+
+      let optHtml = '';
+      if (isMulti) {
+        // 第 3 步：构词雷达（6选多）
+        optHtml = `
+          <div class="grid grid-cols-2 sm:grid-cols-3 gap-2.5 mt-4">
+            ${q.options.map((item, idx) => {
+              const picked = state.multiSelected.has(idx);
+              return `
+                <button id="qOpt-${idx}" onclick="toggleRadarOption(${idx})" ${locked ? 'disabled' : ''}
+                  class="q-opt-btn p-3 rounded-2xl border-2 text-left text-xs sm:text-sm font-bold transition flex items-center justify-between gap-1
+                  ${locked ? 'bg-stone-100 border-stone-200 text-stone-400 cursor-not-allowed' :
+                    (picked ? 'bg-indigo-100 border-indigo-600 text-indigo-950 shadow-sm' : 'bg-white hover:bg-amber-50 border-stone-200 text-stone-800')}">
+                  <span>${item.text}</span>
+                  <span class="w-5 h-5 rounded border-2 flex items-center justify-center text-xs shrink-0 ${picked ? 'bg-indigo-600 border-indigo-600 text-white' : 'border-stone-300'}">
+                    ${picked ? '✓' : ''}
+                  </span>
+                </button>
+              `;
+            }).join('')}
+          </div>
+          <div class="mt-4 flex justify-end">
+            <button id="radarSubmitBtn" onclick="submitRadarMulti()" ${locked ? 'disabled' : ''}
+              class="btn-push px-5 py-2.5 rounded-2xl bg-indigo-600 hover:bg-indigo-700 disabled:bg-stone-300 disabled:text-stone-500 text-white font-black text-xs sm:text-sm">
+              ✅ 确认提交所有构词
+            </button>
+          </div>
+        `;
+      } else {
+        // 第 1 步选词填空 & 第 2 步词义配对
+        optHtml = `
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 mt-4">
+            ${q.options.map((opt, idx) => `
+              <button id="qOpt-${idx}" onclick="submitSingleOption(${idx})" ${locked ? 'disabled' : ''}
+                class="q-opt-btn p-3.5 rounded-2xl border-2 text-left text-xs sm:text-sm font-bold transition flex items-center gap-2.5
+                ${locked ? 'bg-stone-100 border-stone-200 text-stone-400 cursor-not-allowed' : 'bg-white hover:bg-amber-50 hover:border-amber-400 border-stone-200 text-stone-800 shadow-sm'}">
+                <span class="w-6 h-6 rounded-full bg-amber-100 text-amber-800 font-black text-xs flex items-center justify-center shrink-0">
+                  ${['A', 'B', 'C', 'D'][idx]}
+                </span>
+                <span>${opt}</span>
+              </button>
+            `).join('')}
+          </div>
+        `;
+      }
+
+      box.innerHTML = `
+        <div class="flex items-center justify-between gap-2">
+          <span class="px-2.5 py-0.5 rounded-lg bg-emerald-100 text-emerald-900 text-xs font-black">
+            考核重点：【${q.target}】
+          </span>
+          <button onclick="speakCurrentQuiz()" class="px-3 py-1 rounded-full bg-sky-100 hover:bg-sky-200 text-sky-800 text-xs font-bold">
+            🔊 重听朗读
+          </button>
+        </div>
+
+        <p class="mt-3 text-base sm:text-lg font-bold text-stone-900 leading-relaxed">
+          ${q.prompt}
+        </p>
+
+        <div id="xrayHintBox" class="hidden mt-2.5 bg-amber-50 border border-amber-300 rounded-xl p-2.5 text-xs text-amber-900 font-bold"></div>
+
+        ${optHtml}
+      `;
+    }
+
+    // 5 秒冷静审题锁
+    function beginReadingLock5s() {
+      state.phase = 'reading_lock';
+      state.quizSecLeft = 5;
+
+      const box = document.getElementById('quizTimerBox');
+      const icon = document.getElementById('quizTimerIcon');
+      const title = document.getElementById('quizTimerTitle');
+      const num = document.getElementById('quizTimerNum');
+      const bar = document.getElementById('quizTimerProgress');
+
+      box.className = 'mb-3 rounded-2xl border-2 border-sky-300 bg-sky-50 p-3 transition-all';
+      icon.textContent = '👀';
+      title.textContent = '仔细读题，5秒后解锁作答...（先看括弧里的马来文提示）';
+      title.className = 'text-xs sm:text-sm font-black text-sky-900';
+      num.textContent = '5';
+      num.className = 'text-xl font-black text-sky-700';
+      bar.className = 'h-full bg-sky-500 rounded-full transition-all duration-200';
+      bar.style.width = '100%';
+
+      state.quizTimer = setInterval(() => {
+        state.quizSecLeft--;
+        if (state.quizSecLeft > 0) {
+          num.textContent = state.quizSecLeft;
+          bar.style.width = `${(state.quizSecLeft / 5) * 100}%`;
+        } else {
+          clearInterval(state.quizTimer);
+          beginAnswering35s();
+        }
+      }, 1000);
+    }
+
+    // 35 秒正式作答倒计时（最后 10 秒警报闪烁与紧张音乐）
+    function beginAnswering35s() {
+      state.phase = 'answering';
+      state.quizSecLeft = 35;
+
+      const q = state.quizQueue[state.currentQuizIdx];
+      renderQuizBody(q, false);
+
+      const box = document.getElementById('quizTimerBox');
+      const icon = document.getElementById('quizTimerIcon');
+      const title = document.getElementById('quizTimerTitle');
+      const num = document.getElementById('quizTimerNum');
+      const bar = document.getElementById('quizTimerProgress');
+
+      box.className = 'mb-3 rounded-2xl border-2 border-emerald-300 bg-emerald-50 p-3 transition-all';
+      icon.textContent = '⏱️';
+      title.textContent = '作答已解锁！请选出正确答案（最后 10 秒音乐会变紧张哦）';
+      title.className = 'text-xs sm:text-sm font-black text-emerald-900';
+      num.textContent = '35';
+      num.className = 'text-xl font-black text-emerald-700';
+      bar.className = 'h-full bg-emerald-500 rounded-full transition-all duration-200';
+      bar.style.width = '100%';
+
+      state.quizTimer = setInterval(() => {
+        state.quizSecLeft--;
+        num.textContent = Math.max(0, state.quizSecLeft);
+        bar.style.width = `${Math.max(0, (state.quizSecLeft / 35) * 100)}%`;
+
+        if (state.quizSecLeft <= 10 && state.quizSecLeft > 0) {
+          state.bgmPanic = true;
+          box.className = 'mb-3 rounded-2xl border-2 timer-panic p-3 transition-all';
+          icon.textContent = '🚨';
+          title.textContent = '时间快到了！心跳加速，抓紧时间选择！';
+          title.className = 'text-xs sm:text-sm font-black text-rose-700';
+          num.className = 'text-2xl font-black text-rose-600';
+          bar.className = 'h-full bg-rose-600 rounded-full transition-all duration-200';
+          SFX.tickPanic();
+        }
+
+        if (state.quizSecLeft <= 0) {
+          clearInterval(state.quizTimer);
+          state.bgmPanic = false;
+          SFX.wrong();
+          handleMistake('⏰ 35秒时间到啦！看看提示，请点击正确答案完成本题才能继续！');
+        }
+      }, 1000);
+    }
+
+    function submitSingleOption(idx) {
+      if (state.phase !== 'answering') return;
+      const q = state.quizQueue[state.currentQuizIdx];
+      const picked = q.options[idx];
+      const btn = document.getElementById(`qOpt-${idx}`);
+
+      if (picked === q.answer) {
+        btn.className = 'q-opt-btn p-3.5 rounded-2xl border-2 border-emerald-600 bg-emerald-100 text-emerald-950 font-black text-xs sm:text-sm flex items-center gap-2.5';
+        handleSuccess();
+      } else {
+        btn.disabled = true;
+        btn.className = 'q-opt-btn p-3.5 rounded-2xl border-2 border-rose-400 bg-rose-100 text-rose-800 line-through font-bold text-xs sm:text-sm flex items-center gap-2.5 opacity-75';
+        SFX.wrong();
+        handleMistake(`❌ 选错啦！“${picked}”不正确。别灰心，继续点击选出正确答案吧！`);
+      }
+    }
+
+    function toggleRadarOption(idx) {
+      if (state.phase !== 'answering') return;
+      SFX.tap();
+      if (state.multiSelected.has(idx)) state.multiSelected.delete(idx);
+      else state.multiSelected.add(idx);
+      renderQuizBody(state.quizQueue[state.currentQuizIdx], false);
+    }
+
+    function submitRadarMulti() {
+      if (state.phase !== 'answering') return;
+      const q = state.quizQueue[state.currentQuizIdx];
+      if (state.multiSelected.size === 0) {
+        showBannerToast('请先点选构词再按提交哦！');
+        return;
+      }
+
+      let perfect = true;
+      q.options.forEach((opt, idx) => {
+        if (opt.ok !== state.multiSelected.has(idx)) perfect = false;
+      });
+
+      if (perfect) {
+        handleSuccess();
+      } else {
+        SFX.wrong();
+        handleMistake('❌ 构词雷达还没全对（可能漏选或多选了干扰项）！请重新勾选所有 3 个正确构词再提交！');
+      }
+    }
+
+    // 答错处理：温柔提示 + 强制当场点出正确答案 + 复制重排入队列
+    function handleMistake(msg) {
+      const q = state.quizQueue[state.currentQuizIdx];
+      state.streak = 0;
+
+      if (state.currentIsClean) {
+        state.currentIsClean = false;
+        state.firstAttemptTotal++;
+        state.pendingErrorIds.add(q.id);
+
+        // 复制一份插入后面 2 题之后重考
+        const clone = { ...q, isRetryClone: true };
+        const insertAt = Math.min(state.quizQueue.length, state.currentQuizIdx + 3);
+        state.quizQueue.splice(insertAt, 0, clone);
+        document.getElementById('quizProgressPill').textContent = `第 ${state.currentQuizIdx + 1} / ${state.quizQueue.length} 题`;
+      }
+
+      updateDashboard();
+
+      const fb = document.getElementById('quizFeedbackPanel');
+      fb.className = 'mt-4 rounded-2xl p-4 border-2 border-rose-300 bg-rose-50 text-rose-950 transition-all';
+      fb.classList.remove('hidden');
+      document.getElementById('fbEmoji').textContent = '💪';
+      document.getElementById('fbHeading').textContent = '继续加油，找出正确答案过关！';
+      document.getElementById('fbBody').innerHTML = `${msg}<br><span class="text-xs font-black text-rose-700 mt-1 inline-block">🔁 这道错题已加入“待消灭错题”列表，稍后会再次出现考考你！</span>`;
+      document.getElementById('nextQuizBtn').classList.add('hidden');
+    }
+
+    function handleSuccess() {
+      clearInterval(state.quizTimer);
+      state.phase = 'answered';
+      state.bgmPanic = false;
+      SFX.correct();
+
+      document.querySelectorAll('.q-opt-btn').forEach(b => b.disabled = true);
+      const rBtn = document.getElementById('radarSubmitBtn');
+      if (rBtn) rBtn.disabled = true;
+
+      const q = state.quizQueue[state.currentQuizIdx];
+
+      if (state.currentIsClean) {
+        state.firstAttemptTotal++;
+        state.firstAttemptCleanCount++;
+        state.streak++;
+        // 如果之前错过的重练题这次一次答对，从待消灭错题集合中移除！
+        if (q.isRetryClone) {
+          state.pendingErrorIds.delete(q.id);
+        }
+      }
+
+      let pts = state.currentIsClean ? 100 : 50;
+      if (state.doubleTurns > 0) {
+        pts *= 2;
+        state.doubleTurns--;
+        if (state.doubleTurns === 0) document.getElementById('doubleActiveTag').classList.add('hidden');
+      }
+
+      state.score += pts;
+      state.totalCorrect++;
+      updateDashboard();
+
+      const rem = 5 - (state.totalCorrect % 5);
+      document.getElementById('bonusCountdown').textContent = rem === 5 ? 5 : rem;
+
+      const fb = document.getElementById('quizFeedbackPanel');
+      fb.className = 'mt-4 rounded-2xl p-4 border-2 border-emerald-400 bg-emerald-50 text-emerald-950 transition-all';
+      fb.classList.remove('hidden');
+      document.getElementById('fbEmoji').textContent = '🌟';
+      document.getElementById('fbHeading').textContent = `太棒了！回答正确 (+${pts} 分)`;
+      document.getElementById('fbBody').textContent = q.explain;
+
+      const nextBtn = document.getElementById('nextQuizBtn');
+      nextBtn.classList.remove('hidden');
+      nextBtn.textContent = (state.currentQuizIdx === state.quizQueue.length - 1) ? '查看 100% 通关证书 👑' : '进入下一题 ➡️';
+
+      // 每答对 5 题，弹出超级技能宝箱！
+      if (state.totalCorrect % 5 === 0) {
+        setTimeout(() => {
+          SFX.unlock();
+          document.getElementById('chestModal').classList.remove('hidden');
+        }, 600);
+      }
+    }
+
+    function goNextQuestion() {
+      SFX.tap();
+      state.currentQuizIdx++;
+      loadQuizQuestion();
+    }
+
+    // =========================================================================
+    // 8. 超级技能宝箱领取与使用
+    // =========================================================================
+    function pickChestSkill(type) {
+      SFX.correct();
+      state.skills[type]++;
+      syncSkillUI();
+      document.getElementById('chestModal').classList.add('hidden');
+    }
+
+    function syncSkillUI() {
+      ['freeze', 'xray', 'double', 'shield'].forEach(k => {
+        document.getElementById(`cntSkill-${k}`).textContent = `x${state.skills[k]}`;
+        document.getElementById(`btnSkill-${k}`).disabled = state.skills[k] <= 0;
+      });
+    }
+
+    function useSkill(type) {
+      if (state.skills[type] <= 0) return;
+      if (state.phase !== 'answering' && type !== 'double') {
+        showBannerToast('请等 5 秒审题结束后再使用该技能哦！');
+        return;
+      }
+
+      SFX.unlock();
+      state.skills[type]--;
+      syncSkillUI();
+
+      const q = state.quizQueue[state.currentQuizIdx];
+      const isMulti = Array.isArray(q.options) && typeof q.options[0] === 'object';
+
+      if (type === 'freeze') {
+        state.quizSecLeft += 15;
+        state.bgmPanic = false;
+        document.getElementById('quizTimerNum').textContent = state.quizSecLeft;
+        showBannerToast('⏳ 时间冻结生效！作答时间延长 15 秒！');
+      } else if (type === 'xray') {
+        const hintEl = document.getElementById('xrayHintBox');
+        hintEl.classList.remove('hidden');
+        hintEl.textContent = `💡 智慧透视提示：${q.explain}`;
+        if (isMulti) {
+          const goodIdx = q.options.findIndex(o => o.ok);
+          if (goodIdx !== -1) {
+            state.multiSelected.add(goodIdx);
+            renderQuizBody(q, false);
+          }
+        } else {
+          const badIdx = q.options.findIndex(o => o !== q.answer);
+          const b = document.getElementById(`qOpt-${badIdx}`);
+          if (b) { b.disabled = true; b.classList.add('opacity-40', 'line-through'); }
+        }
+      } else if (type === 'double') {
+        state.doubleTurns += 2;
+        document.getElementById('doubleActiveTag').classList.remove('hidden');
+        showBannerToast('✨ 双倍积分卡激活！接下来 2 道题答对得分翻倍！');
+      } else if (type === 'shield') {
+        // 免罚护盾：直接免除本轮错题惩罚并展示解析过关
+        state.currentIsClean = true;
+        showBannerToast('🔄 错题消除护盾生效！免除重排惩罚并已过关！');
+        handleSuccess();
+      }
+    }
+
+    // =========================================================================
+    // 9. 辅助提示与教师演示模式
+    // =========================================================================
+    function showBannerToast(msg) {
+      const old = document.getElementById('toastMsg');
+      if (old) old.remove();
+      const div = document.createElement('div');
+      div.id = 'toastMsg';
+      div.className = 'fixed bottom-5 left-1/2 -translate-x-1/2 z-50 bg-teal-950 text-amber-200 border-2 border-amber-400 px-5 py-3 rounded-2xl shadow-2xl text-xs sm:text-sm font-black';
+      div.textContent = msg;
+      document.body.appendChild(div);
+      setTimeout(() => div.remove(), 2800);
+    }
+
+    function toggleTeacherMode() {
+      state.teacherMode = !state.teacherMode;
+      const tag = document.getElementById('teacherModeTag');
+      if (state.teacherMode) {
+        tag.classList.remove('hidden');
+        FLASHCARDS.forEach(c => state.readCardIds.add(c.id));
+        updateDashboard();
+        renderFlashcard();
+        if (!state.gateUnlocked) unlockRightQuizGate();
+        showBannerToast('👩‍🏫 教师演示模式已开启：跳过5秒等待并解锁全部闪卡与闯关区。');
+      } else {
+        tag.classList.add('hidden');
+        showBannerToast('已切回学生正常学习模式。');
+      }
+    }
+
+    function showWinModal() {
+      SFX.correct();
+      document.getElementById('finalScoreVal').textContent = state.score;
+      document.getElementById('winModal').classList.remove('hidden');
+    }
+
+    function resetGame() {
+      SFX.tap();
+      document.getElementById('winModal').classList.add('hidden');
+      state.currentCardIdx = 0;
+      state.readCardIds.clear();
+      state.gateUnlocked = false;
+      state.quizQueue = [...BASE_QUIZ];
+      state.currentQuizIdx = 0;
+      state.score = 0;
+      state.streak = 0;
+      state.totalCorrect = 0;
+      state.firstAttemptTotal = 0;
+      state.firstAttemptCleanCount = 0;
+      state.pendingErrorIds.clear();
+      state.skills = { freeze: 0, xray: 0, double: 0, shield: 0 };
+      state.doubleTurns = 0;
+
+      syncSkillUI();
+      updateDashboard();
+
+      const overlay = document.getElementById('quizGateOverlay');
+      overlay.classList.remove('hidden', 'opacity-0', 'pointer-events-none');
+      renderFlashcard();
+    }
+
+    window.onload = function () {
+      updateDashboard();
+      renderFlashcard();
+    };
+  </script>
+</body>
+</html>
